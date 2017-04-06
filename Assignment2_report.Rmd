@@ -1,0 +1,34 @@
+---
+title: "Assignment 2"
+author: "Anonymous & Anonymous"
+date: "6 April 2017"
+output: pdf_document
+---
+
+In this assignment we aim to understand, apply, and master *Deep Neural Networks* and *Deep Learning*. In the first section we will focus on quickly describing 3 types of Deep Neural Networks (Convolutional, Recurrent, and Autoencoders), plus providing a proof of understanding through experimenting with existing code and results. The second section will then introduce our DL Challenge project, followed by a detailed description about our approach, experimentation, results, and a concluding discussion.
+
+# 1. Deep Neural Networks
+
+
+### Convolutional
+
+A *Convolutional Neural Network (CNN)*, the first (potentially) Deep Neural Network we consider, uses insights from the organisation of the visual cortex in the brain and tries to summarise information by using receptive fields. In simple words, receptive fields consist of a small set of conditions and provide stronger output / are responsive whenever a stimulus matches these conditions. They are locally applied on the input like a moving window and output a new layer called feature map. One example would be an edge detector in image recognition, which is resembled by a receptive field which responds more strongly whenever one side of it receives dark (e.g., represented as "-1") and the other side receives light ("1") information.
+
+
+### Recurrent
+
+*Recurrent Neural Networks (RNNs)*, in contrast to *Feedforward Neural Networks*, extend the network by including cyclic aspects between the units. Thus, instead of units depending statically on the other layers, elements inside the network may be allowed to change dynamically, so that activations over time can alter the expression of a layer.  
+
+This enables us to make use of sequential information, i.e. we do not have to assume that all inputs (and outputs) are independent of each other. We can use previous computations to alter the network on how to process new incoming information; in other words the network remembers what has happened just before. Good examples for the application of RNNs lie in text processing or *Neuro-Linguistic Programming (NLP)*.
+
+**NLP example here**
+
+
+
+### Autoencoders
+
+
+
+
+# 2. DL Challenge
+
