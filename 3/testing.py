@@ -54,7 +54,6 @@ class Test:
             pred_test  = self.module.decode_y(model.predict(x_test))
             pred_train = self.module.decode_y(model.predict(x_train))
 
-            print("TEST ACC {}".format(np.sum(pred_test == y_test) / len(y_test)))
             accuracy_test. append(np.sum(pred_test == y_test) / len(y_test))
             accuracy_train.append(np.sum(pred_train == y_train) / len(y_train))
             cnf_matrix.append(metrics.confusion_matrix(y_test, pred_test, labels = self.categories))
