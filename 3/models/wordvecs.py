@@ -35,12 +35,12 @@ def get_x_row(row):
 def get_x(d):
     return np.row_stack([get_x_row(row) for index, row in d.iterrows()])
 
-
-model = Sequential([
-    Dense(100, input_dim=2*n_words*300),
-    Activation('relu'),
-    Dense(100),
-    Activation('relu'),
-    Dense(n_categories),
-    Activation('softmax'),
-])
+def create_model():
+    return Sequential([
+        Dense(100, input_dim=2*n_words*300),
+        Activation('relu'),
+        Dense(100),
+        Activation('relu'),
+        Dense(len(categories)),
+        Activation('softmax'),
+    ])

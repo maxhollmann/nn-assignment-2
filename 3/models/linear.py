@@ -18,10 +18,10 @@ def get_x(d):
     return x
 
 
-
-model = Sequential([
-    Dense(7, input_dim=7),
-    Activation('relu'),
-    Dense(n_categories),
-    Activation('softmax'),
-])
+def create_model():
+    return Sequential([
+        Dense(7, input_dim=7),
+        Activation('relu'),
+        Dense(len(categories)),
+        Activation('softmax'),
+    ])

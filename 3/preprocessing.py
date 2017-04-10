@@ -19,6 +19,6 @@ def preprocess_data(d):
     ind = np.logical_or(ind, d['moderated_role'] == 'neither')
     return d[ind]
 
-n_categories = 2
+categories = ['guest', 'nonguest']
 
 nlp = spacy.load('en')
