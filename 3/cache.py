@@ -1,5 +1,10 @@
 import h5py
 import numpy as np
+import os
+
+
+if not os.path.exists("out"):
+    os.makedirs("out")
 
 _file = h5py.File("out/cache.hdf5")
 
