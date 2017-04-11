@@ -12,7 +12,13 @@ In this assignment we aim to understand, apply, and master *Deep Neural Networks
 
 ### Convolutional
 
-A *Convolutional Neural Network (CNN)*, the first (potentially) Deep Neural Network we consider, uses insights from the organisation of the visual cortex in the brain and tries to summarise information by using receptive fields. In simple words, receptive fields consist of a small set of conditions and provide stronger output / are responsive whenever a stimulus matches these conditions. They are locally applied on the input like a moving window and output a new layer called feature map. One example would be an edge detector in image recognition, which is resembled by a receptive field which responds more strongly whenever one side of it receives dark (e.g., represented as "-1") and the other side receives light ("1") information.
+A *Convolutional Neural Network (CNN)*, the first (potentially) Deep Neural Network we consider, uses insights from the organisation of the visual cortex in the brain and tries to summarize information by using receptive fields. In simple words, receptive fields consist of a small set of conditions and provide stronger output / are responsive whenever a stimulus matches these conditions. They are locally applied on the input like a moving window and produce a new layer called feature map. One example would be an edge detector in image recognition, which is resembled by a receptive field which responds more strongly whenever one side of the receptive field receives dark (e.g., represented as "-1") and the other side receives light ("1") information.
+
+#### Example: CIFAR-10.
+
+This dataset stems from a typical computer vision problem: to identify what is on the picture. It consists of 60,000 photos of 32 x 32 pixels. There are 10 different classes such as cars, birds, or airplanes, which the neural network is supposed to learn to categorize by learning from the pictures. 50,000 of the images are used for the training set in the present example, whiule 10,000 images are used to evaluate the overall performance. 
+
+
 
 
 ### Recurrent
@@ -21,13 +27,13 @@ A *Convolutional Neural Network (CNN)*, the first (potentially) Deep Neural Netw
 
 This enables us to make use of sequential information, i.e. we do not have to assume that all inputs (and outputs) are independent of each other. We can use previous computations to alter the network on how to process new incoming information; in other words the network remembers what has happened just before. Good examples for the application of RNNs lie in text processing or *Neuro-Linguistic Programming (NLP)*.
 
-**NLP example here**
+#### Example: the IMDB movie review sentiment classification problem.
 
 
 
 ### Autoencoders
 
-
+The examples above are for supervised learning. Autoencoders instead try to learn "themselves" about the structure of the input given. When given an input vector $x$, the goal is to return an output vector $\hat{x}$ that resembles $x$ as closely as possible. The identity function that was created in such a way is what the experimenter is interested in, as it might reveal new ways of summarizing the data at hand or reveal hidden structures in the data. This is done by compression through forcing the network to represent a smaller and as-similar-as-possible version of the original by fewer hidden nodes than what would be needed to just push through all the information. For instance, picutres of the size 10 x 10 pixels might be compressed to 7 x 7 pixel versions. If the restructured 10 x 10 version $\hat{x}$ is close enough to $\hat{x}$ the autoencoder successfully compressed the data. A related method is PCA, which goal is to project higher-dimensional objects into a lower-dimensional space, so that most of its information is preserved.
 
 
 # 2. DL Challenge
