@@ -30,6 +30,13 @@ def main():
         test.store_plots()
         tests.append(test)
 
+    print("\n")
+    for test in tests:
+        print("{: <16} Accuracy: {:.4f} (test) / {:.4f} (train)".format(
+            test.model_name, test.accuracy_test, test.accuracy_train
+        ))
+
+
 
 if __name__ == "__main__":
     main()
