@@ -17,6 +17,7 @@ def main():
 
     data = read_data(args.data)
 
+    tests = []
     for _, modname, _ in pkgutil.iter_modules(models.__path__):
         if args.only and modname not in args.only:
           continue
@@ -26,8 +27,14 @@ def main():
         module = __import__("models." + modname, fromlist = "dummy")
         test = Test(modname, module, data, use_cache = args.cache)
         test.run()
-        print("Accuracy: {:.4f} (test) / {:.4f} (train)".format(test.accuracy_test, test.accuracy_train))
         test.store_plots()
+        tests.append(test)
+
+    print("\n")
+    for test in tests:
+        print("{: <16} Accuracy: {:.4f} (test) / {:.4f} (train)".format(
+            test.model_name, test.accuracy_test, test.accuracy_train
+        ))
 
 
 
