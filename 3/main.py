@@ -11,8 +11,6 @@ def main():
     parser.add_argument("--data", dest="data", default="data.csv", help="CSV file")
     parser.add_argument("--only", dest="only", nargs="+", help="Only run specified models")
     parser.add_argument("--exclude", dest="exclude", nargs="+", help="Don't run specified models")
-    parser.add_argument('--no-cache', dest='cache', action='store_false')
-    parser.set_defaults(cache=True)
     args = parser.parse_args()
 
     data = read_data(args.data)
@@ -25,16 +23,19 @@ def main():
           continue
 
         module = __import__("models." + modname, fromlist = "dummy")
-        test = Test(modname, module, data, use_cache = args.cache)
-        test.run()
-        test.store_plots()
+        test = Test(modname, module, data)
         tests.append(test)
+
+    for test in tests:
+        test.run_all()
+        #test.store_plots()
 
     print("\n")
     for test in tests:
-        print("{: <16} Accuracy: {:.4f} (test) / {:.4f} (train)".format(
-            test.model_name, test.accuracy_test, test.accuracy_train
-        ))
+        for case in test.cases:
+            print("{: <16} with {: <50} Accuracy: {:.4f} (test) / {:.4f} (train)".format(
+                test.model_name, case.model.params_str(), case.accuracy_test, case.accuracy_train
+            ))
 
 
 

@@ -15,16 +15,12 @@ class Cache:
         self.use = use
 
     def fetch(self, key, f):
-        #if params:
-        #    params_key = map(lambda p: str(p).lower(), params)
-        #else:
-        #    params_key = 'no_params'
-
         k = "{}/{}/{}".format(self.ns, self.version, key)
         if self.use and k in _file:
             print("Using cached {}".format(k))
             return _file[k][:]
         else:
+            print("No cache for {}".format(k))
             val = f()
             if k in _file:
                 del _file[k]
