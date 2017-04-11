@@ -1,6 +1,8 @@
 import argparse
 import pkgutil
 
+from sklearn.model_selection import StratifiedKFold
+
 import models
 from read_data import read_data
 from testing import Test
@@ -15,6 +17,11 @@ def main():
 
     data = read_data(args.data)
 
+
+    splits = StratifiedKFold(n_splits=5, shuffle=True)
+    splits = [s for s in splits.split(data['title'], data['moderated_role'])]
+
+
     tests = []
     for _, modname, _ in pkgutil.iter_modules(models.__path__):
         if args.only and modname not in args.only:
@@ -23,7 +30,7 @@ def main():
           continue
 
         module = __import__("models." + modname, fromlist = "dummy")
-        test = Test(modname, module, data)
+        test = Test(modname, module, data, splits)
         tests.append(test)
 
     for test in tests:

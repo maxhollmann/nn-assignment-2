@@ -3,8 +3,6 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 import os
 
-from sklearn.cross_validation import StratifiedKFold
-
 from plotting import plot_confusion_matrix
 
 
@@ -19,9 +17,10 @@ from plotting import plot_confusion_matrix
 # - version           used to invalidate cache
 
 class TestCase:
-    def __init__(self, model, data):
+    def __init__(self, model, data, splits):
         self.model = model
         self.data = data
+        self.splits = splits
 
         self.accuracy_test  = None
         self.accuracy_train = None
@@ -31,11 +30,10 @@ class TestCase:
         y = self.model.get_y(self.data)
         x = self.model.get_x(self.data)
 
-        skf = StratifiedKFold(y, n_folds=5, shuffle=True)
         accuracy_test  = []
         accuracy_train = []
         cnf_matrix     = []
-        for i, (train, test) in enumerate(skf):
+        for i, (train, test) in enumerate(self.splits):
             x_train, x_test = x[train], x[test]
             y_train, y_test = y[train], y[test]
 
@@ -56,17 +54,19 @@ class TestCase:
 
 
 class Test:
-    def __init__(self, name, module, data):
+    def __init__(self, name, module, data, splits):
         self.model_name    = name
         self.Model         = module.Model
         self.data          = data
+        self.splits        = splits
 
 
     def run_all(self):
         print("Testing '{}' version {}".format(self.model_name, self.Model.version))
+
         self.cases = []
         for params in self.Model.params:
-            case = TestCase(self.Model(params), self.data)
+            case = TestCase(self.Model(params), self.data, self.splits)
             self.cases.append(case)
 
         for case in self.cases:
