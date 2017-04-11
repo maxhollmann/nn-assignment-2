@@ -10,6 +10,11 @@ version = 1
 
 n_words = 5
 
+params = [
+    {'layers': [100, 100], 'epochs': 15},
+    {'layers': [100, 100], 'epochs': 25},
+]
+
 def get_x_row(row):
     name_re = re.compile(re.escape(row['name']), re.IGNORECASE)
     desc = name_re.sub("THENAME", row['description'])
