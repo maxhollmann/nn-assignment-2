@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 11 10:36:07 2017
+Created on Tue Apr 11 10:50:11 2017
 
-Convolutional Network Example
+Convolutional Neural Network original plot.
 
 @author: marc
 """
@@ -19,4 +19,3 @@ for i in range(0, 9):
 	pyplot.imshow(toimage(X_train[i]))
 # show the plot
 pyplot.show()
-
