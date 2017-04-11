@@ -47,9 +47,7 @@ class Model(BaseModel):
 
     def create_model(self):
         return Sequential([
-            Dense(100, input_dim=2*self.params['n_words']*300),
-            Activation('relu'),
-            Dense(100),
+            Dense(1000, input_dim=2*self.params['n_words']*300),
             Activation('relu'),
             Dense(len(self.categories)),
             Activation('softmax'),
