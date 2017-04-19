@@ -40,9 +40,6 @@ def preprocess_data(d):
 
     pd.options.mode.chained_assignment = 'warn'
 
-    for k in d:
-        print("{: <50}: {: <40} ({})".format(k, d[k][0], type(d[k][0])))
-
     return d
 
 
