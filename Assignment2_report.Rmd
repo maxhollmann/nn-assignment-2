@@ -35,17 +35,34 @@ For the sake of the assignment we were interested in scaling down the problem to
 
 #### Result
 
-Probing different learning rates and batch sizes (finally, we sticked with the original), the reduced dataset achieved a test set accuracy of 55.32%, which is, on the one hand, not a good result when trying to use the model in practice. On the other hand, it still does relatively well in predicting the 10 categories given that we took away half of the information. Indeed, one should expect that a lot of examples are necessary for complex recognition tasks such as this one, and it is definitely worth the effort to obtain a large dataset when trying to achieve a high accuracy.
+Probing different learning rates and batch sizes (finally, we sticked with the original), the reduced dataset achieved a validation set accuracy of 55.32%, which is, on the one hand, not a good result when trying to use the model in practice. On the other hand, it still does relatively well in predicting the 10 categories given that we took away half of the information. Indeed, one should expect that a lot of examples are necessary for complex recognition tasks such as this one, and it is definitely worth the effort to obtain a large dataset when trying to achieve a high accuracy.
 
 ### Recurrent
 
 *Recurrent Neural Networks (RNNs)*, in contrast to *Feedforward Neural Networks*, extend the network by including cyclic aspects between the units. Thus, instead of units depending statically on the other layers, elements inside the network may be allowed to change dynamically, so that activations over time can alter the expression of a layer.  
 
-This enables us to make use of sequential information, i.e. we do not have to assume that all inputs (and outputs) are independent of each other. We can use previous computations to alter the network on how to process new incoming information; in other words the network remembers what has happened just before. Good examples for the application of RNNs lie in text processing or *Neuro-Linguistic Programming (NLP)*.
+This enables us to make use of sequential information, i.e. we do not have to assume that all inputs (and outputs) are independent of each other. We can use previous computations to alter the network on how to process new incoming information; in other words the network remembers what has happened just before. Good examples for the application of RNNs lie in text processing or *Neuro-Linguistic Programming (NLP)*. An sometimes used architecture is *Long Short-Term Memory (LSTM)*, which constructs "smart neurons" that, depending on the input, keep the old information intact or overwrite it with the new information.
 
-#### Example: the IMDB movie review sentiment classification problem.
+#### Example using LSTM: the IMDB movie review sentiment classification problem
 
+This NLP problem comes with a dataset containing movie reviews of users from IMDB.com. The goal is to find out whether they are positive or negative reviews; in other words, we need to construct a neural net which uses the aspects of a review that hint towards one or the other and learn heuristics that enable it to make an accurate classification. A trick that is being used here is Embedding, which maps each word onto an length $n$ vector (here $n = 32$) that is supposed to resemble the unique position of a word in a $n$-dimensional space. (Note that the original dataset transformed the words into sorted integers from most to least common word, however the same mechanism applies). To simplify the problem, the authors decided to limit the data by using only the most frequent 5000 words and truncating or lengthening (concatenating 0s) the reviews so that their length was always 500 words.
 
+The researchers decided on the following structure:
+
+1. Embedded layer: uses length 32 vector to represent each word.
+(1.1.) Dropout: 0.2 
+2. LSTM layer: 100 "smart neurons"
+(2.1.) Dropout: 0.2
+3. Dense output layer: single neuron with sigmoid activation function for good/bad classification
+
+The bracketed layers were investigated in order to see whether dropout layers might solve overfitting issues in the model. Dropout prevents units in the neural net to adapt too much to another unit by randomly dropping them during training. A batch size of 64 words When running the model, it achieves a 86.79% validation set accuracy without, and 86.36% with dropout.
+
+We were wondering what's the specific effect of the LSTM smart neurons on the test set accuracy and ran the model several times with differing amounts. Below a summary table:
+
+10:
+50:
+100: 86.79%
+300:
 
 ### Autoencoders
 
