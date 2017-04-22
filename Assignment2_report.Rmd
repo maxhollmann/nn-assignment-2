@@ -20,14 +20,14 @@ This dataset stems from a typical computer vision problem: to identify what is o
 
 The researchers came up with the following structure to learn about the data:
 
-1. Convolutional input layer, 32 feature maps with a size of 3×3, a rectifier activation function and a weight constraint of max norm set to 3.
-2. Dropout set to 20%.
-3. Convolutional layer, 32 feature maps with a size of 3×3, a rectifier activation function and a weight constraint of max norm set to 3.
-4. Max Pool layer with size 2×2.
-5. Flatten layer.
-6. Fully connected layer with 512 units and a rectifier activation function.
-7. Dropout set to 50%.
-8. Fully connected output layer with 10 units and a softmax activation function.
+1. Convolutional input layer: 32 feature maps with a size of 3×3, a rectifier activation function and a weight constraint of max norm set to 3
+2. Dropout: 20%.
+3. Convolutional layer: 32 feature maps with a size of 3×3, a rectifier activation function and a weight constraint of max norm set to 3
+4. Max Pool layer: size 2×2.
+5. Flatten layer
+6. Dense layer: 512 units and a rectifier activation function
+7. Dropout: 50%.
+8. Dense output layer: 10 units and a softmax activation function.
 
 A batch size of 32 was used and it was run for 25 epochs. The model contains 4,210,090 trainable parameters and the accuracy achieved was 70.85% (note that they improved it to 80.18% in a very extensive version later). 
 
@@ -36,6 +36,22 @@ For the sake of the assignment we were interested in scaling down the problem to
 #### Result
 
 Probing different learning rates and batch sizes (finally, we sticked with the original), the reduced dataset achieved a validation set accuracy of 55.32%, which is, on the one hand, not a good result when trying to use the model in practice. On the other hand, it still does relatively well in predicting the 10 categories given that we took away half of the information. Indeed, one should expect that a lot of examples are necessary for complex recognition tasks such as this one, and it is definitely worth the effort to obtain a large dataset when trying to achieve a high accuracy.
+
+### Autoencoders
+
+The examples above are for supervised learning. Autoencoders instead try to learn "themselves" about the structure of the input given. When given an input vector $x$, the goal is to return an output vector $\hat{x}$ that resembles $x$ as closely as possible. The identity function that was created in such a way is what the experimenter is interested in, as it might reveal new ways of summarizing the data at hand (i.e., dimensionality reduction) or reveal hidden structures in the data (i.e., data denoising). This is done by compression through forcing the network to represent a smaller and as-similar-as-possible version of the original by fewer hidden nodes than what would be needed to just push through all the information. For instance, pictures of the size 10 x 10 pixels might be compressed to 7 x 7 pixel versions. If the restructured 10 x 10 version $\hat{x}$ is close enough to $\hat{x}$ the autoencoder successfully compressed the data. A related method is *Principal Component Analysis (PCA)*, which goal is to project higher-dimensional objects into a lower-dimensional space, so that most of its information is preserved.
+
+#### Example: CIFAR-10 Convolutional Autoencoder
+
+Before we handled the CIFAR-10 problem with a convolutional net and achieved rather mediocre accuracy with our reduced dataset. We could also be interested in compressing the data using autoencoders to get a better idea about the underlying properties of the categories. This could aid future approaches to improve on the accuracy concerning the problem by giving a sense for the complexity of the data.
+
+For that we used existing code for the MNIST handwritten digts dataset and applied it to the CIFAR-10 problem, experimenting with batch size, learning rate, and epochs.
+
+#### Result
+
+
+
+
 
 ### Recurrent
 
@@ -50,25 +66,36 @@ This NLP problem comes with a dataset containing movie reviews of users from IMD
 The researchers decided on the following structure:
 
 1. Embedded layer: uses length 32 vector to represent each word.
-(1.1.) Dropout: 0.2 
+(1.1. Dropout: 20%)
 2. LSTM layer: 100 "smart neurons"
-(2.1.) Dropout: 0.2
+(2.1. Dropout: 20%)
 3. Dense output layer: single neuron with sigmoid activation function for good/bad classification
 
 The bracketed layers were investigated in order to see whether dropout layers might solve overfitting issues in the model. Dropout prevents units in the neural net to adapt too much to another unit by randomly dropping them during training. A batch size of 64 reviews were used and only 3 epochs were run because of overfitting concerns. When running the model, it achieved a 86.79% validation set accuracy without, and 86.36% with dropout.
 
-We were wondering what's the specific effect of the LSTM smart neurons on the test set accuracy and ran the model several times with differing amounts to see whether it provides any insights. Taking more than in the example greatly increased the computation time, therefore we focused on reducing the amount of smart neurons and see how much are necessary to achieve acceptable results. Below a summary table:
+We were wondering what's the specific effect of the LSTM smart neurons on the test set accuracy and ran the model several times with differing amounts to see whether it provides any insights. Taking more than in the example greatly increased the computation time, therefore we focused on reducing the amount of smart neurons and see how much are necessary to achieve acceptable results.
 
-10: 78.64%
-20: 85.82%
-50: 87.87%
-100: 86.79%
+#### Result
 
+```{r, echo = F, warning = F}
+library(knitr)
+d <- data.frame(Neurons = c(10, 20, 50, 100), Test.Accuracy = c("78.64%", "85.82%",  "87.87%", "86.79%"))
+kable(d, caption = "Recurrent Network: Smart Neurons Necessary to Achieve Good Predictions")
+```
 
-### Autoencoders
+The table indicates that best accuracy is actually being achieved with 50 smart neurons instead of 100. Our first intuition is that it might be a result of overfitting in the 100 neuron case. Other reasons we came up with are that (1) more epochs might be necessary to fit appropriately on the larger set, or (2) the batch size should be increased to reduce variance in the weight updates to counteract increased noise.  
 
-The examples above are for supervised learning. Autoencoders instead try to learn "themselves" about the structure of the input given. When given an input vector $x$, the goal is to return an output vector $\hat{x}$ that resembles $x$ as closely as possible. The identity function that was created in such a way is what the experimenter is interested in, as it might reveal new ways of summarizing the data at hand or reveal hidden structures in the data. This is done by compression through forcing the network to represent a smaller and as-similar-as-possible version of the original by fewer hidden nodes than what would be needed to just push through all the information. For instance, picutres of the size 10 x 10 pixels might be compressed to 7 x 7 pixel versions. If the restructured 10 x 10 version $\hat{x}$ is close enough to $\hat{x}$ the autoencoder successfully compressed the data. A related method is PCA, which goal is to project higher-dimensional objects into a lower-dimensional space, so that most of its information is preserved.
 
 
 # 2. DL Challenge
+
+
+
+# References
+
+- http://machinelearningmastery.com/object-recognition-convolutional-neural-networks-keras-deep-learning-library/
+- http://neuralnetworksanddeeplearning.com/chap6.html
+- https://blog.keras.io/building-autoencoders-in-keras.html
+- http://machinelearningmastery.com/predict-sentiment-movie-reviews-using-deep-learning/
+- http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/
 
