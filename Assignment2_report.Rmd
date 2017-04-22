@@ -55,14 +55,15 @@ The researchers decided on the following structure:
 (2.1.) Dropout: 0.2
 3. Dense output layer: single neuron with sigmoid activation function for good/bad classification
 
-The bracketed layers were investigated in order to see whether dropout layers might solve overfitting issues in the model. Dropout prevents units in the neural net to adapt too much to another unit by randomly dropping them during training. A batch size of 64 words When running the model, it achieves a 86.79% validation set accuracy without, and 86.36% with dropout.
+The bracketed layers were investigated in order to see whether dropout layers might solve overfitting issues in the model. Dropout prevents units in the neural net to adapt too much to another unit by randomly dropping them during training. A batch size of 64 reviews were used and only 3 epochs were run because of overfitting concerns. When running the model, it achieved a 86.79% validation set accuracy without, and 86.36% with dropout.
 
-We were wondering what's the specific effect of the LSTM smart neurons on the test set accuracy and ran the model several times with differing amounts. Below a summary table:
+We were wondering what's the specific effect of the LSTM smart neurons on the test set accuracy and ran the model several times with differing amounts to see whether it provides any insights. Taking more than in the example greatly increased the computation time, therefore we focused on reducing the amount of smart neurons and see how much are necessary to achieve acceptable results. Below a summary table:
 
-10:
-50:
+10: 78.64%
+20: 85.82%
+50: 87.87%
 100: 86.79%
-300:
+
 
 ### Autoencoders
 

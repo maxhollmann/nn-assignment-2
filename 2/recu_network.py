@@ -26,7 +26,7 @@ X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
 embedding_vector_length = 32
 model = Sequential()
 model.add(Embedding(top_words, embedding_vector_length, input_length=max_review_length))
-model.add(LSTM(50))
+model.add(LSTM(20))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
