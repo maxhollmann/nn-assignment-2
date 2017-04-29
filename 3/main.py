@@ -6,6 +6,7 @@ from sklearn.model_selection import StratifiedKFold
 import models
 from read_data import read_data
 from testing import Test
+from logger import CsvLogger
 
 
 def main():
@@ -21,6 +22,8 @@ def main():
     splits = StratifiedKFold(n_splits=5, shuffle=True)
     splits = [s for s in splits.split(data['title'], data['moderated_role'])]
 
+    csv_acc = CsvLogger("accuracy", ["model", "params", "epoch", "acc"])
+
 
     tests = []
     for _, modname, _ in pkgutil.iter_modules(models.__path__):
@@ -34,14 +37,13 @@ def main():
         tests.append(test)
 
     for test in tests:
-        test.run_all()
-        #test.store_plots()
+        test.run_all(csv_acc)
 
     print("\n")
     for test in tests:
         for case in test.cases:
-            print("{: <16} with {: <50} Accuracy: {:.4f} (test) / {:.4f} (train)".format(
-                test.model_name, case.model.params_str(), case.accuracy_test, case.accuracy_train
+            print("{: <16} with {: <50} Accuracy: {:.4f}".format(
+                test.model_name, case.model.params_str(), case.accuracy_test[-1]
             ))
 
 
