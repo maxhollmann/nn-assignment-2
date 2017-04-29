@@ -11,7 +11,7 @@ from keras.layers import Input, Dense
 from keras.models import Model
 
 # this is the size of our encoded representations
-encoding_dim = 64  # 32 floats -> compression of factor 24.5, assuming the input is 784 floats
+encoding_dim = 128  # 32 floats -> compression of factor 24.5, assuming the input is 784 floats
 
 # this is our input placeholder
 input_img = Input(shape=(1024,))
