@@ -1,5 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras import optimizers
 import numpy as np
 
 from base_model import BaseModel
@@ -10,7 +11,7 @@ class Model(BaseModel):
     version = 1
 
     params = [
-        {},
+        {'opt': optimizers.SGD, 'epochs': 20, 'lr': 0.001},
     ]
 
 

@@ -2,7 +2,8 @@ import numpy as np
 import spacy
 import re
 from keras.models import Sequential
-from keras.layers import Dense, Activation
+from keras.layers import Dense, Activation, LSTM
+from keras.layers.embeddings import Embedding
 
 from base_model import BaseModel
 
@@ -12,12 +13,7 @@ nlp = spacy.load('en')
 class Model(BaseModel):
     version = 1
 
-    params = []
-    for n_words in [1, 3, 5, 10, 15]:
-       for l1 in [[1], [10], [100], [1000]]:
-           for l2 in [[], [1], [10], [100], [1000]]:
-               params.append({'n_words': n_words, 'hidden': l1 + l2})
-
+    params = [{}]
 
 
     def get_x(self, d):

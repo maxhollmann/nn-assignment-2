@@ -1,8 +1,21 @@
 import numpy as np
 import pandas as pd
+from keras.callbacks import Callback
+from keras import optimizers
 import re
 
 from cache import Cache
+
+
+class TestCallback(Callback):
+    def __init__(self, model, test_data):
+        self._model = model
+        self.test_data = test_data
+
+    def on_epoch_end(self, epoch, logs={}):
+        x, y = self.test_data
+        loss, mae, acc = self.model.evaluate(x, y, verbose=0)
+        self._model.acc_history.append(acc)
 
 
 class BaseModel:
@@ -22,28 +35,31 @@ class BaseModel:
         return dummies.as_matrix()
 
     def decode_y(self, y):
-        return np.where(np.argmax(y, 1) == 1, "nonguest", "guest")
+        return np.where(np.argmax(y, 1) == 0, "guest", "nonguest")
 
 
     def reset(self):
         self.model = self.create_model()
 
     def compile(self):
-        return self.model.compile(optimizer='rmsprop',
-                                  loss='categorical_crossentropy',
+        sgd = self.params['opt'](lr = self.params['lr'])
+        return self.model.compile(optimizer=sgd,
+                                  loss='binary_crossentropy',
                                   metrics=['mae', 'acc'])
 
-    def fit(self, x, y):
-        return self.model.fit(x, self.encode_y(y), epochs = 15)
+    def fit(self, x, y, test_x, test_y):
+        self.acc_history = []
+        validation = (test_x, self.encode_y(test_y))
+        return self.model.fit(x, self.encode_y(y),
+                              epochs = self.params['epochs'], batch_size = 32,
+                              validation_data = validation,
+                              callbacks=[TestCallback(self, validation)])
 
     def predict(self, x):
         return self.decode_y(self.model.predict(x))
 
 
     def params_str(self):
-        return str(self.params)
-
-    def params_filename_part(self):
         def sanitize(s):
             s = str(s)
             s = re.sub("^\\W+", "", s)

@@ -40,18 +40,21 @@ class TestCase:
 
             self.model.reset()
             self.model.compile()
-            self.model.fit(x_train, y_train)
+            self.model.fit(x_train, y_train, x_test, y_test)
+
+            accuracy_test.append(self.model.acc_history)
 
             pred_test  = self.model.predict(x_test)
-            pred_train = self.model.predict(x_train)
-
-            accuracy_test. append(np.sum(pred_test == y_test) / len(y_test))
-            accuracy_train.append(np.sum(pred_train == y_train) / len(y_train))
             cnf_matrix.append(metrics.confusion_matrix(y_test, pred_test, labels = self.model.categories))
 
-        self.accuracy_test  = np.mean(accuracy_test)
-        self.accuracy_train = np.mean(accuracy_train)
+        self.accuracy_test  = np.mean(accuracy_test, axis = 0)
+        self.accuracy_train = 0
         self.cnf_matrix     = np.mean(cnf_matrix, axis=0)
+
+    def log_acc(self, csv_acc):
+        for i, acc in enumerate(self.model.acc_history):
+            csv_acc.log([self.model_name, self.model.params_str(), i, acc])
+
 
     def store_plots(self):
         fig = plt.figure()
@@ -60,7 +63,7 @@ class TestCase:
                               title='Confusion matrix for {}'.format(self.model_name),
                               normalize = True)
 
-        plt.savefig(self.path("{}__confusion_matrix.png".format(self.model.params_filename_part())))
+        plt.savefig(self.path("{}__confusion_matrix.png".format(self.model.params_str())))
         plt.close()
 
     def path(self, filename):
@@ -91,9 +94,7 @@ class Test:
             print("    params: {}".format(case.model.params_str()))
             try:
                 case.run()
-                csv_acc.log([
-                    self.model_name, case.model.params_str(),
-                    case.accuracy_test, case.accuracy_train])
+                case.log_acc(csv_acc)
                 case.store_plots()
             except Exception as e:
                 import traceback

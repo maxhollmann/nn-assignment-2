@@ -3,6 +3,7 @@ import spacy
 import re
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras import optimizers
 
 from base_model import BaseModel
 
@@ -12,7 +13,9 @@ nlp = spacy.load('en')
 class Model(BaseModel):
     version = 1
 
-    params = [{'n_words': 3, 'hidden': [100]}]
+    params = [
+        {'opt': optimizers.SGD, 'epochs': 20, 'lr': 0.001, 'n_words': 3, 'hidden': [100]},
+    ]
     #for n_words in [1, 3, 5, 10, 15]:
     #   for l1 in [[1], [10], [100], [1000]]:
     #       for l2 in [[], [1], [10], [100], [1000]]:
