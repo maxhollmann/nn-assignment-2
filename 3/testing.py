@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 
 from plotting import plot_confusion_matrix
+from logger import log
 
 
 # model consists of
@@ -62,7 +63,8 @@ class Test:
 
 
     def run_all(self):
-        print("Testing '{}' version {}".format(self.model_name, self.Model.version))
+        print("Testing '{}' version {} - {} configurations".format(
+            self.model_name, self.Model.version, len(self.Model.params)))
 
         self.cases = []
         for params in self.Model.params:
@@ -73,6 +75,9 @@ class Test:
             print("    params: {}".format(case.model.params_str()))
             try:
                 case.run()
+                log("{} - {}: {} / {}".format(
+                    self.model_name, case.model.params_str(),
+                    case.accuracy_test, case.accuracy_train))
             except Exception as e:
                 import traceback
                 print("\n")
