@@ -11,7 +11,7 @@ from keras.layers import Input, Dense
 from keras.models import Model
 
 # this is the size of our encoded representations
-encoding_dim = 128  # 32 floats -> compression of factor 24.5, assuming the input is 784 floats
+encoding_dim = 512  # 32 floats -> compression of factor 24.5, assuming the input is 784 floats
 
 # this is our input placeholder
 input_img = Input(shape=(1024,))
@@ -49,8 +49,8 @@ x_train = x_train.reshape((len(x_train), np.prod(x_train.shape[1:])))
 x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
 
 autoencoder.fit(x_train, x_train,
-                epochs=50,
-                batch_size=256,
+                epochs=20,
+                batch_size=10,
                 shuffle=True,
                 validation_data=(x_test, x_test))
 

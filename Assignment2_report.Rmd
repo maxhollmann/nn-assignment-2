@@ -2,13 +2,14 @@
 title: "Assignment 2"
 author: "Anonymous & Anonymous"
 date: "6 April 2017"
-output: pdf_document
+output: 
+  pdf_document:
+    fig_caption: yes
 ---
 
-In this assignment we aim to understand, apply, and master *Deep Neural Networks* and *Deep Learning*. In the first section we will focus on quickly describing 3 types of Deep Neural Networks (Convolutional, Recurrent, and Autoencoders), plus providing a proof of understanding through experimenting with existing code and results. The second section will then introduce our DL Challenge project, followed by a detailed description about our approach, experimentation, results, and a concluding discussion.
+In this assignment we aim to understand, apply, and master *Deep Neural Networks (DNN)* and *Deep Learning*. In the first section we will describe 3 types of (potential) *DNN*s: Convolutional, Autoencoders, and Recurrent; plus providing a proof of understanding through experimenting with existing code and results. The second section will then introduce our Deep Learning Challenge project, followed by a detailed description about our approach, experimentation, results, and a concluding discussion.
 
 # 1. Deep Neural Networks
-
 
 ### Convolutional
 
@@ -45,13 +46,23 @@ The examples above are for supervised learning. Autoencoders instead try to lear
 
 Before we handled the CIFAR-10 problem with a convolutional net and achieved rather mediocre accuracy with our reduced dataset. We could also be interested in compressing the data using autoencoders to get a better idea about the underlying properties of the categories. This could aid future approaches to improve on the accuracy concerning the problem by giving a sense for the complexity of the data.
 
-For that we used existing code for the MNIST handwritten digts dataset and applied it to the CIFAR-10 problem, experimenting with batch size, learning rate, and epochs. Most importantly, we needed to find a suitable encoding dimensionality.
+For that we used existing code for the MNIST handwritten digts dataset and applied it to the CIFAR-10 problem, experimenting with batch size, learning rate, and epochs. Our goal was to find a suitable dimensionality so that we will be able to identify the images after compression and on the same time achieve some downscaling.
 
 #### Result
 
+The autoencoder had the following (simple) structure:
 
+1. Input: 32x32 pixels stacked to length 1024 vector.
+2. Encoding Layer: Dense layer to reduced dimensions with ReLu activation function.
+3. Decoding Layer: Dense layer back to length 1024 vector with sigmoid activation function.
 
+The model was being compiled using the AdaDelta optimizer and per-pixel binary crossentropy loss. To simplify the problem we dropped color information, so that we ended up with black and white pictures. Different representations are summarized below:
 
+![Example Input Images](2/autoencoder_input.png)
+
+![Output Images, each line with different dimensionality: (1) 32 floats (val_loss = 0.60), (2) 64 floats (val_loss = 0.60), (3) 128 floats (val_loss = 0.59), (4) 512 floats (val_loss = 0.58).](2/autoencoder_alloutput.png)
+
+The validation loss seems pretty high when comparing it to the MNIST results and it is obvious from the pictures that we did not really manage to reproduce the original pictures after downscaling them to the smaller feature vectors. The images must be to complex for the amount of data we have, thus it is difficult to find underlying patterns that can summarize the images. This definitely makes sense in comparison to the MNIST dataset, in which large patches of the pictures can be summarized more efficiently than here (i.e., monotonous black areas). 
 
 ### Recurrent
 
@@ -85,7 +96,45 @@ kable(d, caption = "Recurrent Network: Smart Neurons Necessary to Achieve Good P
 
 The table indicates that best accuracy is actually being achieved with 50 smart neurons instead of 100. Our first intuition is that it might be a result of overfitting in the 100 neuron case. Other reasons we came up with are that (1) more epochs might be necessary to fit appropriately on the larger set, or (2) the batch size should be increased to reduce variance in the weight updates to counteract increased noise.  
 
-# 2. DL Challenge
+# 2. Deep Learning Challenge: Podcast Guests & NLP
+
+Who's joining the podcast? Usually, when trying to find a podcast with your favorite star speaking as a guest, you end up scrolling through many irrelevant alternatives. They range from people just talking about him or her, talking about a song or movie related to him or her, or the star's name might even just be used in a keyword-like fashion to generate more clicks.
+
+To overcome this, for our Deep Learning Challenge we were interested in whether we can apply Deep Learning to Podcast descriptions. We want to find out whether a person's name occurred in the podcast description because the person is an actual guest at the show or whether it was due to any other reason.
+
+## Data & Preprocessing
+
+To get a better idea about how a typical podcast description might look like, see the following example:
+
+![Example of a podcast description: Bill Simmons Podcast Ep. 92 with guest Louis C.K.](podcast_example_labelled.png)
+
+Podcast descriptions can take up various lengths from title only up to a full blog post, which makes the raw data very heterogeneous. In order to approach the problem, we first had to scrape podcasts from the web (we used iTunes) and identify occurrences of names. This was achieved through the Stanford Named Entity Recognizer (NER), which proved to have a very good accuracy. From there we manually labelled 1219 occurrences of names into "guest" (36.2%) or "no guest" (63.8%) from the descriptions of a total of 550 podcast episodes.
+
+#### NLP
+
+## Results
+
+#### I. Simple 1-Layer Network
+
+
+
+#### II. NLP: Word Vectors
+
+premature settings:
+
+- val_acc for different optimizers, convergence to 64%
+- confusion matrix classified all to 1 group
+
+
+#### III. NLP: LSTM 
+
+### IV. Net + Metadata
+
+
+
+## Discussion
+
+#### Architecture
 
 
 
@@ -96,4 +145,4 @@ The table indicates that best accuracy is actually being achieved with 50 smart 
 - https://blog.keras.io/building-autoencoders-in-keras.html
 - http://machinelearningmastery.com/predict-sentiment-movie-reviews-using-deep-learning/
 - http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/
-
+- Jenny Rose Finkel, Trond Grenager, and Christopher Manning. 2005. Incorporating Non-local Information into Information Extraction Systems by Gibbs Sampling. Proceedings of the 43nd Annual Meeting of the Association for Computational Linguistics (ACL 2005), pp. 363-370. http://nlp.stanford.edu/~manning/papers/gibbscrf3.pdf
