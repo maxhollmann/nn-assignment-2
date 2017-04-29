@@ -14,7 +14,9 @@ class Model(BaseModel):
     version = 1
 
     params = [
-        {'opt': optimizers.SGD, 'epochs': 20, 'lr': 0.001, 'n_words': 3, 'hidden': [100]},
+        #{'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.1, 'n_words': 3, 'hidden': [100]},
+        #{'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
+        {'opt': optimizers.SGD, 'epochs': 500, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
     ]
     #for n_words in [1, 3, 5, 10, 15]:
     #   for l1 in [[1], [10], [100], [1000]]:
@@ -63,8 +65,8 @@ class Model(BaseModel):
                 Dense(h)
             ])
         layers.extend([
-            Activation('relu'), Dense(len(self.categories)),
-            Activation('softmax')
+            Dense(self.n_out),
+            Activation('sigmoid'),
         ])
 
         return Sequential(layers)

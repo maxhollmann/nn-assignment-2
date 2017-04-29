@@ -20,6 +20,7 @@ class TestCallback(Callback):
 
 class BaseModel:
     categories = ['guest', 'nonguest']
+    n_out = 1
 
     def __init__(self, params):
         self.params = params
@@ -30,12 +31,14 @@ class BaseModel:
         return np.where(d['moderated_role'] == 'guest', 'guest', 'nonguest')
 
     def encode_y(self, y):
-        y = np.where(y == 'guest', 'guest', 'nonguest')
-        dummies = pd.get_dummies(y)
-        return dummies.as_matrix()
+        y = np.where(y == 'guest', [1], [0])
+        return y
+        #dummies = pd.get_dummies(y)
+        #return dummies.as_matrix()
 
     def decode_y(self, y):
-        return np.where(np.argmax(y, 1) == 0, "guest", "nonguest")
+        y = y.transpose()[0]
+        return np.where(y > 0.5, "guest", "nonguest")
 
 
     def reset(self):
@@ -51,7 +54,7 @@ class BaseModel:
         self.acc_history = []
         validation = (test_x, self.encode_y(test_y))
         return self.model.fit(x, self.encode_y(y),
-                              epochs = self.params['epochs'], batch_size = 32,
+                              epochs = self.params['epochs'], batch_size = 256,
                               validation_data = validation,
                               callbacks=[TestCallback(self, validation)])
 

@@ -56,7 +56,7 @@ class Model(BaseModel):
                 Dense(h)
             ])
         layers.extend([
-            Activation('relu'), Dense(len(self.categories)),
+            Activation('relu'), Dense(self.n_out),
             Activation('softmax')
         ])
 
