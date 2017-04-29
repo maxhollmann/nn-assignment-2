@@ -18,10 +18,11 @@ from logger import log
 # - version           used to invalidate cache
 
 class TestCase:
-    def __init__(self, model, data, splits):
-        self.model = model
-        self.data = data
-        self.splits = splits
+    def __init__(self, test, params):
+        self.model_name = test.model_name
+        self.model = test.Model(params)
+        self.data = test.data
+        self.splits = test.splits
 
         self.accuracy_test  = None
         self.accuracy_train = None
@@ -53,6 +54,22 @@ class TestCase:
         self.accuracy_train = np.mean(accuracy_train)
         self.cnf_matrix     = np.mean(cnf_matrix, axis=0)
 
+    def store_plots(self):
+        fig = plt.figure()
+        plot_confusion_matrix(self.cnf_matrix,
+                              classes = self.model.categories,
+                              title='Confusion matrix for {}'.format(self.model_name),
+                              normalize = True)
+
+        plt.savefig(self.path("{}__confusion_matrix.png".format(self.model.params_filename_part())))
+        plt.close()
+
+    def path(self, filename):
+        dir = os.path.join("out", self.model_name)
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        return os.path.join(dir, filename)
+
 
 class Test:
     def __init__(self, name, module, data, splits):
@@ -68,7 +85,7 @@ class Test:
 
         self.cases = []
         for params in self.Model.params:
-            case = TestCase(self.Model(params), self.data, self.splits)
+            case = TestCase(self, params)
             self.cases.append(case)
 
         for case in self.cases:
@@ -78,25 +95,9 @@ class Test:
                 log("{} - {}: {} / {}".format(
                     self.model_name, case.model.params_str(),
                     case.accuracy_test, case.accuracy_train))
+                case.store_plots()
             except Exception as e:
                 import traceback
                 print("\n")
                 traceback.print_exc()
                 print("\n")
-
-
-    def store_plots(self):
-        fig = plt.figure()
-        plot_confusion_matrix(self.cnf_matrix,
-                              classes = self.Model.categories,
-                              title='Confusion matrix for {}'.format(self.model_name),
-                              normalize = True)
-
-        plt.savefig(self.path("confusion_matrix.png"))
-        plt.close()
-
-    def path(self, filename):
-        dir = os.path.join("out", self.model_name)
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        return os.path.join(dir, filename)

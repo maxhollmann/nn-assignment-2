@@ -12,11 +12,11 @@ nlp = spacy.load('en')
 class Model(BaseModel):
     version = 1
 
-    params = []
-    for n_words in [1, 3, 5, 10, 15]:
-       for l1 in [[1], [10], [100], [1000]]:
-           for l2 in [[], [1], [10], [100], [1000]]:
-               params.append({'n_words': n_words, 'hidden': l1 + l2})
+    params = [{'n_words': 3, 'hidden': [100]}]
+    #for n_words in [1, 3, 5, 10, 15]:
+    #   for l1 in [[1], [10], [100], [1000]]:
+    #       for l2 in [[], [1], [10], [100], [1000]]:
+    #           params.append({'n_words': n_words, 'hidden': l1 + l2})
 
 
 

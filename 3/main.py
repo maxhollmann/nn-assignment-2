@@ -35,7 +35,6 @@ def main():
 
     for test in tests:
         test.run_all()
-        #test.store_plots()
 
     print("\n")
     for test in tests:

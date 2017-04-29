@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import re
 
 from cache import Cache
 
@@ -41,3 +42,14 @@ class BaseModel:
 
     def params_str(self):
         return str(self.params)
+
+    def params_filename_part(self):
+        def sanitize(s):
+            s = str(s)
+            s = re.sub("^\\W+", "", s)
+            s = re.sub("\\W+$", "", s)
+            s = re.sub("\\W+", "-", s)
+            return s
+
+        parts = map(lambda i: "{}={}".format(i[0], sanitize(i[1])), self.params.items())
+        return "_".join(parts)
