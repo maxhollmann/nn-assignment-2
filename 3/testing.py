@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import os
 
 from plotting import plot_confusion_matrix
-from logger import log
 
 
 # model consists of
@@ -79,7 +78,7 @@ class Test:
         self.splits        = splits
 
 
-    def run_all(self):
+    def run_all(self, csv_acc):
         print("Testing '{}' version {} - {} configurations".format(
             self.model_name, self.Model.version, len(self.Model.params)))
 
@@ -92,9 +91,9 @@ class Test:
             print("    params: {}".format(case.model.params_str()))
             try:
                 case.run()
-                log("{} - {}: {} / {}".format(
+                csv_acc.log([
                     self.model_name, case.model.params_str(),
-                    case.accuracy_test, case.accuracy_train))
+                    case.accuracy_test, case.accuracy_train])
                 case.store_plots()
             except Exception as e:
                 import traceback
