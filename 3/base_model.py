@@ -65,9 +65,9 @@ class BaseModel:
     def params_str(self):
         def sanitize(s):
             s = str(s)
-            s = re.sub("^\\W+", "", s)
-            s = re.sub("\\W+$", "", s)
-            s = re.sub("\\W+", "-", s)
+            s = re.sub("^[^\w.]+", "", s)
+            s = re.sub("[^\w.]+$", "", s)
+            s = re.sub("[^\w.]+", "-", s)
             return s
 
         parts = map(lambda i: "{}={}".format(i[0], sanitize(i[1])), self.params.items())

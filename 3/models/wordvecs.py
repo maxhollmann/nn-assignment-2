@@ -14,8 +14,9 @@ class Model(BaseModel):
     version = 1
 
     params = [
-        #{'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.1, 'n_words': 3, 'hidden': [100]},
-        #{'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
+        {'opt': optimizers.SGD, 'epochs': 10, 'lr': 0.1, 'n_words': 3, 'hidden': [100]},
+        {'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.1, 'n_words': 3, 'hidden': [100]},
+        {'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
         {'opt': optimizers.SGD, 'epochs': 500, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
     ]
     #for n_words in [1, 3, 5, 10, 15]:

@@ -3,10 +3,7 @@ import numpy as np
 import os
 
 
-if not os.path.exists("out"):
-    os.makedirs("out")
-
-_file = h5py.File("out/cache.hdf5")
+_file = h5py.File("cache.hdf5")
 
 class Cache:
     def __init__(self, namespace, version, use = True):
