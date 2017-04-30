@@ -3,7 +3,6 @@ import spacy
 import re
 from keras.models import Sequential
 from keras.layers import Dense, Activation
-from keras import optimizers
 
 from base_model import BaseModel
 
@@ -26,7 +25,7 @@ class Model(BaseModel):
             for n_words in [2, 3, 5]:
                for l1 in [[10], [100], [1000]]:
                    for l2 in [[], l1]:
-                       params.append({'opt': optimizers.SGD, 'epochs': epochs, 'lr': lr, 'n_words': n_words, 'hidden': l1 + l2})
+                       params.append({'opt': 'SGD', 'epochs': epochs, 'lr': lr, 'n_words': n_words, 'hidden': l1 + l2})
 
 
 

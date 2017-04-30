@@ -2,6 +2,7 @@ import numpy as np
 from sklearn import metrics
 import matplotlib.pyplot as plt
 import paths
+from glob import glob
 
 from plotting import plot_confusion_matrix
 from logger import CsvLogger
@@ -53,10 +54,10 @@ class TestCase:
         self.cnf_matrix     = np.mean(cnf_matrix, axis=0)
 
     def log_acc(self):
-        csv = CsvLogger(self.path("{}__accuracy.csv".format(self.model.params_str())),
+        csv = CsvLogger(self.path("accuracy.csv"),
                         ["model", "params", "epoch", "acc"])
         for i, acc in enumerate(self.model.acc_history):
-            csv.log([self.model_name, self.model.params_str(), i, acc])
+            csv.log([self.model_name, self.model.params_json(), i, acc])
 
 
     def store_plots(self):
@@ -66,11 +67,12 @@ class TestCase:
                               title='Confusion matrix for {}'.format(self.model_name),
                               normalize = True)
 
-        plt.savefig(self.path("{}__confusion_matrix.png".format(self.model.params_str())))
+        plt.savefig(self.path("confusion_matrix.png"))
         plt.close()
 
     def path(self, filename):
-        return paths.f(self.model_name, str(self.model.version), f = filename)
+        return paths.f(self.model_name, str(self.model.version),
+                       f = "{}__{}".format(self.model.params_str(), filename))
 
 
 class Test:
@@ -90,12 +92,15 @@ class Test:
             case = TestCase(self, params)
             self.cases.append(case)
 
-        for case in self.cases:
-            print("    params: {}".format(case.model.params_str()))
+        for i, case in enumerate(self.cases):
+            print("    {}/{}   params: {}".format(i, len(self.cases), str(case.model.params)))
             try:
-                case.run()
-                case.log_acc()
-                case.store_plots()
+                if len(glob(case.path("*"))) == 0:
+                    case.run()
+                    case.log_acc()
+                    case.store_plots()
+                else:
+                    print("Found existing output for model, skipping")
             except Exception as e:
                 import traceback
                 print("\n")

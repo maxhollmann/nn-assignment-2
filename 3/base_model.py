@@ -3,6 +3,7 @@ import pandas as pd
 from keras.callbacks import Callback
 from keras import optimizers
 import re
+import json
 
 from cache import Cache
 
@@ -45,8 +46,9 @@ class BaseModel:
         self.model = self.create_model()
 
     def compile(self):
-        sgd = self.params['opt'](lr = self.params['lr'])
-        return self.model.compile(optimizer=sgd,
+        Optimizer = getattr(optimizers, self.params['opt'])
+        opt = Optimizer(lr = self.params['lr'])
+        return self.model.compile(optimizer=opt,
                                   loss='binary_crossentropy',
                                   metrics=['mae', 'acc'])
 
@@ -70,5 +72,10 @@ class BaseModel:
             s = re.sub("[^\w.]+", "-", s)
             return s
 
-        parts = map(lambda i: "{}={}".format(i[0], sanitize(i[1])), self.params.items())
+        items = self.params.items()
+        items = sorted(items, key = lambda i: i[0])
+        parts = map(lambda i: "{}={}".format(i[0], sanitize(i[1])), items)
         return "_".join(parts)
+
+    def params_json(self):
+        return json.dumps(self.params)
