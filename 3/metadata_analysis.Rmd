@@ -1,0 +1,97 @@
+---
+title: "Caret Package Analysis"
+author: "Marc Volkert"
+date: "31 Januar 2017"
+output: 
+  html_document:
+    toc: true
+    theme: united
+---
+
+## Load data
+
+```{r}
+load("metadata_dataset.Rdat")
+df <- df[, -c(1,2)]
+```
+
+## Caret package
+
+```{r message = F}
+#install.packages("caret")
+require(caret)
+```
+
+
+## Create train and test
+
+```{r}
+set.seed(10)
+Train <- createDataPartition(df$role, p=0.6, list=FALSE)
+training <- df[ Train, ]
+testing <- df[ -Train, ]
+```
+
+
+# 2-class prediction
+
+```{r}
+training$role <- ifelse(training$role == "guest", "guest", "no_guest")
+testing$role <- ifelse(testing$role == "guest", "guest", "no_guest")
+```
+
+## Train and test full model
+
+### GLM standard approach
+
+The following chunks perform a 10-fold cross-validation + testing the best fit.
+
+1. setup specs for randomly splitting the training data into 9 train and 1 validation subsets
+
+```{r}
+ctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 3, savePredictions = TRUE)
+```
+
+2. use the combined train data to estimate the validation data, repeats 10 times so that every subset has been validation data once. then it tunes model parameters so that best overall fit is found when looking at the 10 different models created
+
+```{r}
+#set.seed(17)
+mod_fit <- train(role ~ .,  data = training, method = "glm", family = "binomial", trControl = ctrl, tuneLength = 5)
+```
+
+3. the best fit is tested on the test set
+
+```{r}
+pred <- predict(mod_fit, newdata = testing)
+conf_mat <- confusionMatrix(data = pred, testing$role, positive = "guest")
+conf_mat
+```
+
+- important parts:
+
+    + the prediction vs. reference table (1: guest, 0: no guest)
+    + sensitivity: the percentage of actual guests we'd successfully label as guests on new data
+    + specificity: the percentage of actual non-guests we'd successfully NOT label as guests
+    + Pos Pred Value: In this "guest or not" approach we only want to label potential guests and otherwise do nothing: then we can ignore the mistakes we make when the model says "don't label" as we will just leave it open for future labeling. Thus row 1 (predict: 0) does not matter too much to us. We want to be able to be mostly correct when the prediction say "label", so on row 2.
+
+### Include other approaches 
+
+```{r}
+# train the LVQ model
+#set.seed(7)
+modelLvq <- train(role ~ ., data = training, method = "lvq", trControl = ctrl)
+
+# train the GBM model
+#set.seed(7)
+modelGbm <- train(role ~ ., data = training, method = "gbm", trControl=ctrl, verbose=FALSE)
+
+# train the SVM model
+#set.seed(7)
+modelSvm <- train(role ~ ., data = training, method = "svmRadial", trControl=ctrl)
+
+# collect resamples
+results <- resamples(list(GLM = mod_fit, LVQ = modelLvq, GBM = modelGbm, SVM = modelSvm))
+train_res <- summary(results)
+# dot plots of results
+dotplot(results)
+```

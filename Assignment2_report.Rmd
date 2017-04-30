@@ -2,12 +2,15 @@
 title: "Assignment 2"
 author: "Anonymous & Anonymous"
 date: "6 April 2017"
+header-includes:
+  - \usepackage{amsmath}
+  - \usepackage{mathtools}
 output: 
   pdf_document:
     fig_caption: yes
 ---
 
-In this assignment we aim to understand, apply, and master *Deep Neural Networks (DNN)* and *Deep Learning*. In the first section we will describe 3 types of (potential) *DNN*s: Convolutional, Autoencoders, and Recurrent; plus providing a proof of understanding through experimenting with existing code and results. The second section will then introduce our Deep Learning Challenge project, followed by a detailed description about our approach, experimentation, results, and a concluding discussion.
+In this assignment we aim to understand, apply, and master *Deep Neural Networks (DNN)* and *Deep Learning* in *Keras* (with the *Tensorflow* backend). In the first section we will describe 3 types of (potential) *DNN*s: Convolutional, Autoencoders, and Recurrent; plus providing a proof of understanding through experimenting with existing code and results. The second section will then introduce our Deep Learning Challenge project, followed by a detailed description about our approach, experimentation, results, and a concluding discussion.
 
 # 1. Deep Neural Networks
 
@@ -98,51 +101,131 @@ The table indicates that best accuracy is actually being achieved with 50 smart 
 
 # 2. Deep Learning Challenge: Podcast Guests & NLP
 
-Who's joining the podcast? Usually, when trying to find a podcast with your favorite star speaking as a guest, you end up scrolling through many irrelevant alternatives. They range from people just talking about him or her, talking about a song or movie related to him or her, or the star's name might even just be used in a keyword-like fashion to generate more clicks.
+Who's joining the podcast episode? Usually, when trying to find a podcast with your favorite star speaking as a guest, you end up scrolling through many irrelevant alternatives. They range from people just talking about him or her, talking about a song or movie related to him or her, or the star's name might even just be used in a keyword-like fashion to generate more clicks.
 
-To overcome this, for our Deep Learning Challenge we were interested in whether we can apply Deep Learning to Podcast descriptions. We want to find out whether a person's name occurred in the podcast description because the person is an actual guest at the show or whether it was due to any other reason.
+To overcome this, for our Deep Learning Challenge we were interested in whether we can apply Deep Learning to podcast descriptions. We want to find out whether a person's name occurred in the podcast description because the person is an actual guest at the show or whether it was due to any other reason.
 
 ## Data & Preprocessing
 
-To get a better idea about how a typical podcast description might look like, see the following example:
+Podcast episode descriptions are very heterogeneous: They can take up various lengths from title only up to a full blog post, discuss different topics, and may include a lot of (to us) irrelevant names. To get a better idea about how a typical description might look like, see the following example:
 
-![Example of a podcast description: Bill Simmons Podcast Ep. 92 with guest Louis C.K.](podcast_example_labelled.png)
+![Example of a podcast description: Bill Simmons Podcast Ep. 92 with guest Louis C.K.; our goal is to find out that Louis C.K. is a guest.](podcast_example_labelled.png)
 
-Podcast descriptions can take up various lengths from title only up to a full blog post, which makes the raw data very heterogeneous. In order to approach the problem, we first had to scrape podcasts from the web (we used iTunes) and identify occurrences of names. This was achieved through the Stanford Named Entity Recognizer (NER), which proved to have a very good accuracy. From there we manually labelled 1219 occurrences of names into "guest" (36.2%) or "no guest" (63.8%) from the descriptions of a total of 550 podcast episodes.
+In order to approach the problem, we first had to scrape podcasts from the web (we used iTunes) and identify occurrences of names. This was achieved through the Stanford Named Entity Recognizer (NER), which proved to have a very good detection rate. From there we manually labelled 1219 occurrences of names into "guest" (36.2%) or "no guest" (63.8%) from the descriptions (incl. title) of a total of 550 podcast episodes.
 
-#### NLP
+## I. NLP: Word Vectors
 
-## Results
+When wondering on how to solve the machine learning problem, we tried to come up with a model that somewhat mimicks the cognitive process we are undergoing when identifying a guest from a non-guest. We noticed that, instead of scanning the whole document, we would usually quickly scan for a name, consider only the couple of words surrounding a name, and derive from its syntax what role the person will play in the podcast episode. This led us to chunk our data into portions with $n$ words to the left and the right, thus of the structure:
 
-#### I. Simple 1-Layer Network
+\begin{equation}
+  S_{t-n}, ..., S_{t-2}, S_{t-1}, S_{t} = S_{name}, S_{t+1}, S_{t+2}, ..., S_{t+n}
+\end{equation}
+
+We also considered other ideas, such as taking full sentences in which a name appeared.
+The advantage of this approach, however, was that the input for our network was always of the same size, which significantly reduced issues coming up in creating the architecture for our neural net.
+
+Having the data organized, it still wasn't suited for analysis as we were dealing with strings. For that reason we made use of embedding techniques which map words to a predefined vector of dimensionality, or size, $p$. This way all words are put into a space in which they can be meaningfully related to each othee. For instance, a distance measure will give a smaller value for the word vectors "king" and "queen", as compared to word vectors "king" and "apple". A suitable package in Python was *spacyIO*, which comes with a pre-trained vector with $p = 300$ from the Common Crawl corpus, which represents the cutting edge standard embedding vector for practical NLP. It was constructed using the *GloVe* algorithm (see References for documentation and examples). Strings $S$ were subsequently transformed into word vectors $x \in \mathbb{R}^{300}$. Since we only needed the location of the name $S_{name}$ and not its actual meaning, we could drop it, being left with our input data of size $2 \times n \times 300$:
+
+\begin{equation}
+  Input = x_{t-n}, ..., x_{t-2}, x_{t-1}, x_{t+1}, x_{t+2}, ..., x_{t+n}
+\end{equation}
+
+In case a name appeared at the very beginning (as it might happen in the title) or the end of the description, we replaced the missing data with meaningless (i.e. zero) vectors. As a final note, we also treated punctuation, brackets, and so on as "words" in our sequence of vectors, as it might represent important information as well.
+
+#### Preliminary Results
+
+To get a feeling about the classification ability of a simple network, we constructed a 1-or-2-layer neural network, setting up its architecture in a way that it classifies into guest or non-guest. 
+
+To find out the best parameters for the model, we first experimented a bit with them to get a feeling about the range that makes sense and then tried out each possible combinations of the following options:
+
+- $n$ = 2, 3, 5
+- learning rate: 0.01, 0.05, 0.1
+- epochs: 10, 100, 250
+- hidden layers: 1, 2
+- nodes of hidden layers: 10, 100, 1000
+
+Additionally, we experimented with batch size, where we agreed to use segments of 256 inputs, and optimizers, with *Stochastic Gradient Descent (SGD)* performing the best. The final network we ended up with achieved a validation accuracy of 75.31% and had the following architecture:
+
+1. Input layer: $2 \times 5 \times 300 = 3000$ nodes
+2. Dense hidden layer: 100 nodes with ReLu activation function
+3. Dense hidden layer: 100 nodes with ReLu activation function
+4. Dense output layer: 1 node for classification with sigmoid activation function.
+
+## II. NLP: LSTM 
+
+A more sophisticated approach for word vectors is to construct them from one's own dataset, as they will be trained on the relevant domain (i.e., how words are related to each other in podcast episode descriptions). Keras allows for such constructions with the `Embedding` layer
+
+
+- make embedding / word vectors ourselves with most frequent 4000 or k words (p = 32)
+- works better because trained in this domain
+- Recurrent network: LSTM neurons to understand syntax 
 
 
 
-#### II. NLP: Word Vectors
+## III. Convolutional LSTM
 
-premature settings:
-
-- val_acc for different optimizers, convergence to 64%
-- confusion matrix classified all to 1 group
+- implement convolutional layers
 
 
-#### III. NLP: LSTM 
+## IV. Metadata
 
-### IV. Net + Metadata
+In order to achieve high performance, we gave the problem some more thought and obtained 7 other parameters of interest which were accompanying the podcast episode descriptions:
 
+- name occurred in title (yes/no)
+- name occurred in description (yes/no)
+- name used as podcast author on iTunes (yes/no; to identify podcast hosts)
+- "with" comes before name in title (yes/no)
+- name is first word in description (yes/no)
+- amount of times name (also: first/last name only) is mentioned in description (int)
+- amount of times name is mentioned in dataset source (int; also unlabelled cases)
+
+Some of the metadata should help us disentangle the different roles people have in podcast descriptions (e.g. being "officially" listed as podcast author makes you pretty unlikely to be a guest at a show). 
+
+#### Preliminary Results
+
+We applied standard supervised machine learning techniques to the classification problem and found a couple of them to work out relatively well. The best ones were *Learning Vector Quantization (LVQ)*, *Support Vector Machines (SVM)*, *Gradient Boosting Machines (GBM)*, and *Generalized Linear Modelling (GLM)*. GBM and GLM achieved pretty high results, with GLM slightly outperforming GBM with a mean cross-validated accuracy of 76.14%. See the graph below for a summary of the accuracies:
+
+```{r, out.width = "200px", echo = F, fig.cap= "Cross-validated accuracy of supervised learning algorithms using metadata.", fig.align='center'}
+knitr::include_graphics("metadata_acc.png")
+```
+
+## V. Net + Metadata
 
 
 ## Discussion
 
+- best model
+
+Premature models often ended up classifying only to one class ("no guest"), just because of non-guests making up a larger portion of the labelled outcomes. Thus, a lower bound for our accuracies was the prior probability P("no guest") = 63.8%.
+
 #### Architecture
 
+It was difficult to know which architecture should be applied in order to create a well-functioning neural net. We tried to stick with some rules of thumb when coming up with a successful architecture:
+
+- It should be inspired by networks that proved effective already
+- One should take an additive approach by starting with a minimal amount of hidden layers and then experiment whether adding layers improves the outcome.
+- Hidden layers usually contain an amount of nodes which is smaller than the input layer nodes and larger than the output layer nodes.
+
+The challenging aspect about our project was that most NLP networks were dealing with slightly different problems, so that there was no easy generalization we could derive. Still
+
+- question on how to create best architecture
+- followed theory, but might be different for our problem
 
 
 # References
+
+Deep Neural Networks:
 
 - http://machinelearningmastery.com/object-recognition-convolutional-neural-networks-keras-deep-learning-library/
 - http://neuralnetworksanddeeplearning.com/chap6.html
 - https://blog.keras.io/building-autoencoders-in-keras.html
 - http://machinelearningmastery.com/predict-sentiment-movie-reviews-using-deep-learning/
 - http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/
+
+Deep Learning Challenge:
+
 - Jenny Rose Finkel, Trond Grenager, and Christopher Manning. 2005. Incorporating Non-local Information into Information Extraction Systems by Gibbs Sampling. Proceedings of the 43nd Annual Meeting of the Association for Computational Linguistics (ACL 2005), pp. 363-370. http://nlp.stanford.edu/~manning/papers/gibbscrf3.pdf
+- https://spacy.io/docs/usage/word-vectors-similarities
+- https://nlp.stanford.edu/projects/glove/
+
+
