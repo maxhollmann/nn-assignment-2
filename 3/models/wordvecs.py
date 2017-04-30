@@ -13,16 +13,20 @@ nlp = spacy.load('en')
 class Model(BaseModel):
     version = 1
 
-    params = [
-        {'opt': optimizers.SGD, 'epochs': 10, 'lr': 0.1, 'n_words': 3, 'hidden': [100]},
-        {'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.1, 'n_words': 3, 'hidden': [100]},
-        {'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
-        {'opt': optimizers.SGD, 'epochs': 500, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
-    ]
-    #for n_words in [1, 3, 5, 10, 15]:
-    #   for l1 in [[1], [10], [100], [1000]]:
-    #       for l2 in [[], [1], [10], [100], [1000]]:
-    #           params.append({'n_words': n_words, 'hidden': l1 + l2})
+    #params = [
+    #    {'opt': optimizers.SGD, 'epochs': 10, 'lr': 0.1, 'n_words': 3, 'hidden': [100]},
+    #    {'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.1, 'n_words': 3, 'hidden': [100]},
+    #    {'opt': optimizers.SGD, 'epochs': 100, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
+    #    {'opt': optimizers.SGD, 'epochs': 500, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
+    #]
+
+    params = []
+    for epochs in [10, 100, 250]:
+        for lr in [0.01, 0.05, 0.1]:
+            for n_words in [2, 3, 5]:
+               for l1 in [[10], [100], [1000]]:
+                   for l2 in [[], l1]:
+                       params.append({'opt': optimizers.SGD, 'epochs': epochs, 'lr': lr, 'n_words': n_words, 'hidden': l1 + l2})
 
 
 
