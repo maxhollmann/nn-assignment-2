@@ -19,14 +19,21 @@ class Model(BaseModel):
     #    {'opt': optimizers.SGD, 'epochs': 500, 'lr': 0.05, 'n_words': 3, 'hidden': [100]},
     #]
 
-    params = []
-    for epochs in [10, 100, 250]:
-        for lr in [0.01, 0.05, 0.1]:
-            for n_words in [2, 3, 5]:
-               for l1 in [[10], [100], [1000]]:
-                   for l2 in [[], l1]:
-                       params.append({'opt': 'SGD', 'epochs': epochs, 'lr': lr, 'n_words': n_words, 'hidden': l1 + l2})
+    # params = []
+    # for epochs in [10, 100, 250]:
+    #     for lr in [0.01, 0.05, 0.1]:
+    #         for n_words in [2, 3, 5]:
+    #            for l1 in [[10], [100], [1000]]:
+    #                for l2 in [[], l1]:
+    #                    params.append({'opt': 'SGD', 'epochs': epochs, 'lr': lr, 'n_words': n_words, 'hidden': l1 + l2})
 
+    params = []
+    for epochs in [250, 300, 400]:
+        for lr in [0.025, 0.05, 0.075]:
+            for n_words in [5, 10]:
+               for l1 in [[1000], [1500], [2000]]:
+                   for nhidden in [1, 2, 3]:
+                       params.append({'bs': 256, 'opt': 'SGD', 'epochs': epochs, 'lr': lr, 'n_words': n_words, 'hidden': l1 * nhidden})
 
 
     def get_x(self, d):
