@@ -25,3 +25,6 @@ for (model in list.files(out_dir, include.dirs = T, full.names = T)) {
 }
 
 write.csv(models, paste(out_dir, "models.csv", sep = "/"))
+
+
+models = models[order(models$acc), ]

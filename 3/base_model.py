@@ -56,7 +56,7 @@ class BaseModel:
         self.acc_history = []
         validation = (test_x, self.encode_y(test_y))
         return self.model.fit(x, self.encode_y(y),
-                              epochs = self.params['epochs'], batch_size = 256,
+                              epochs = self.params['epochs'], batch_size = self.params.get('bs', 256),
                               validation_data = validation,
                               callbacks=[TestCallback(self, validation)])
 

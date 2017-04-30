@@ -5,6 +5,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence, text
+from collections import Counter
 
 from base_model import BaseModel
 
@@ -14,11 +15,24 @@ nlp = spacy.load('en')
 class Model(BaseModel):
     version = 1
 
-    params = [{}]
+    params = [
+        {'opt': 'SGD', 'lr': 0.05, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+        {'opt': 'SGD', 'lr': 0.05, 'epochs': 2, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+        {'opt': 'SGD', 'lr': 0.05, 'epochs': 3, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+
+        {'opt': 'SGD', 'lr': 0.2, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+        {'opt': 'SGD', 'lr': 0.9, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+
+        {'opt': 'SGD', 'lr': 0.1, 'epochs': 2, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'dropout': 0.2},
+
+        {'opt': 'SGD', 'lr': 0.1, 'epochs': 2, 'bt': 32, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'dropout': 0.2},
+
+        {'opt': 'SGD', 'lr': 0.1, 'epochs': 2, 'bt': 32, 'embedlen': 32, 'vocabsize': 400, 'textlen': 50, 'dropout': 0.2},
+    ]
 
 
     def get_x(self, d):
-        def get_row(row):
+        def row_tokens(row):
             def tokenize(s):
                 return np.array([w.lower_ for w in nlp(s)])
 
@@ -28,53 +42,57 @@ class Model(BaseModel):
             tokens = tokenize(text)
             for n in name_parts:
                 tokens = np.where(tokens == n, "thename", tokens)
+
             return tokens
 
 
-            name_re = re.compile(re.escape(row['name']), re.IGNORECASE)
-            desc = name_re.sub("THENAME", row['description'])
-            doc = nlp(desc)
-            doclist = [w.string.strip() for w in doc]
-            pad_vector = nlp('.').vector
-            try:
-                ind = doclist.index("THENAME")
-            except ValueError:
-                ind = -100
+        def get_vocab(tokenized, n):
+            c = Counter()
+            for t in tokenized:
+                c.update(t)
+            mc = c.most_common(n - 1)
+            vocab = {w: i + 1 for i, (w, f) in enumerate(mc)}
+            return np.vectorize(lambda word: vocab.get(word, 0))
 
-            out = []
-            for i in list(range(ind - self.params['n_words'], ind)) + list(range(ind + 1, ind + self.params['n_words'] + 1)):
-                if i < 0 or i >= len(doc):
-                    out.append(pad_vector)
-                else:
-                    out.append(doc[i].vector)
+        def get_indexed():
+            tokenized = [row_tokens(row) for index, row in d.iterrows()]
+            vocab = get_vocab(tokenized, self.params['vocabsize'])
+            indexed = np.array([vocab(row) for row in tokenized])
+            indexed = sequence.pad_sequences(indexed, self.params['textlen'])
+            return indexed
 
-            return np.hstack(out)
+        k = "x_indexed/vocabsize={}_textlen={}".format(self.params['vocabsize'], self.params['textlen'])
+        indexed = self.cache.fetch(k, get_indexed)
+        return indexed
 
-
-        def get():
-            r = d.loc[0, :]
-            r = get_row(r)
-            return np.row_stack([get_row(row) for index, row in d.iterrows()])
-
-        import code; code.interact(local=dict(globals(), **locals()))
-        #
-        #k = "x/n_words={}".format(self.params['n_words'])
-        #return self.cache.fetch(k, get)
 
     def create_model(self):
-        hidden = self.params['hidden']
+        embedding = Embedding(self.params['vocabsize'],
+                              self.params['embedlen'],
+                              mask_zero = True,
+                              input_length = self.params['textlen'])
 
-        layers = [
-            Dense(hidden[0], input_dim=2*self.params['n_words']*300)
-        ]
-        for h in hidden[1:]:
-            layers.extend([
-                Activation('relu'),
-                Dense(h)
-            ])
-        layers.extend([
-            Activation('relu'), Dense(self.n_out),
-            Activation('softmax')
-        ])
+        model = Sequential()
+        model.add(embedding)
 
-        return Sequential(layers)
+        dropout = self.params.get('dropout', 0)
+        model.add(LSTM(100, dropout=dropout, recurrent_dropout=dropout))
+        model.add(Dense(self.n_out, activation='sigmoid'))
+
+
+        # hidden = self.params['hidden']
+
+        # layers = [
+        #     Dense(hidden[0], input_dim=2*self.params['n_words']*300)
+        # ]
+        # for h in hidden[1:]:
+        #     layers.extend([
+        #         Activation('relu'),
+        #         Dense(h)
+        #     ])
+        # layers.extend([
+        #     Activation('relu'), Dense(self.n_out),
+        #     Activation('softmax')
+        # ])
+
+        return model

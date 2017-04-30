@@ -93,7 +93,7 @@ class Test:
             self.cases.append(case)
 
         for i, case in enumerate(self.cases):
-            print("    {}/{}   params: {}".format(i, len(self.cases), str(case.model.params)))
+            print("    {}/{}   params: {}".format(i + 1, len(self.cases), str(case.model.params)))
             try:
                 if len(glob(case.path("*"))) == 0:
                     case.run()
