@@ -17,7 +17,7 @@ class Model(BaseModel):
 
     def create_model(self):
         return Sequential([
-            Dense(len(self.categories), input_dim=7),
+            Dense(self.n_out, input_dim=7),
             Activation('softmax'),
         ])
 

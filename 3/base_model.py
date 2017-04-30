@@ -3,6 +3,7 @@ import pandas as pd
 from keras.callbacks import Callback
 from keras import optimizers
 import re
+import json
 
 from cache import Cache
 
@@ -20,6 +21,7 @@ class TestCallback(Callback):
 
 class BaseModel:
     categories = ['guest', 'nonguest']
+    n_out = 1
 
     def __init__(self, params):
         self.params = params
@@ -30,20 +32,23 @@ class BaseModel:
         return np.where(d['moderated_role'] == 'guest', 'guest', 'nonguest')
 
     def encode_y(self, y):
-        y = np.where(y == 'guest', 'guest', 'nonguest')
-        dummies = pd.get_dummies(y)
-        return dummies.as_matrix()
+        y = np.where(y == 'guest', [1], [0])
+        return y
+        #dummies = pd.get_dummies(y)
+        #return dummies.as_matrix()
 
     def decode_y(self, y):
-        return np.where(np.argmax(y, 1) == 0, "guest", "nonguest")
+        y = y.transpose()[0]
+        return np.where(y > 0.5, "guest", "nonguest")
 
 
     def reset(self):
         self.model = self.create_model()
 
     def compile(self):
-        sgd = self.params['opt'](lr = self.params['lr'])
-        return self.model.compile(optimizer=sgd,
+        Optimizer = getattr(optimizers, self.params['opt'])
+        opt = Optimizer(lr = self.params['lr'])
+        return self.model.compile(optimizer=opt,
                                   loss='binary_crossentropy',
                                   metrics=['mae', 'acc'])
 
@@ -51,7 +56,7 @@ class BaseModel:
         self.acc_history = []
         validation = (test_x, self.encode_y(test_y))
         return self.model.fit(x, self.encode_y(y),
-                              epochs = self.params['epochs'], batch_size = 32,
+                              epochs = self.params['epochs'], batch_size = 256,
                               validation_data = validation,
                               callbacks=[TestCallback(self, validation)])
 
@@ -62,10 +67,15 @@ class BaseModel:
     def params_str(self):
         def sanitize(s):
             s = str(s)
-            s = re.sub("^\\W+", "", s)
-            s = re.sub("\\W+$", "", s)
-            s = re.sub("\\W+", "-", s)
+            s = re.sub("^[^\w.]+", "", s)
+            s = re.sub("[^\w.]+$", "", s)
+            s = re.sub("[^\w.]+", "-", s)
             return s
 
-        parts = map(lambda i: "{}={}".format(i[0], sanitize(i[1])), self.params.items())
+        items = self.params.items()
+        items = sorted(items, key = lambda i: i[0])
+        parts = map(lambda i: "{}={}".format(i[0], sanitize(i[1])), items)
         return "_".join(parts)
+
+    def params_json(self):
+        return json.dumps(self.params)

@@ -4,6 +4,7 @@ import re
 from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM
 from keras.layers.embeddings import Embedding
+from keras.preprocessing import sequence, text
 
 from base_model import BaseModel
 
@@ -18,6 +19,18 @@ class Model(BaseModel):
 
     def get_x(self, d):
         def get_row(row):
+            def tokenize(s):
+                return np.array([w.lower_ for w in nlp(s)])
+
+            name_parts = row['name'].lower().split()
+
+            text = "{}\n\n{}".format(row['title'], row['description']).strip()
+            tokens = tokenize(text)
+            for n in name_parts:
+                tokens = np.where(tokens == n, "thename", tokens)
+            return tokens
+
+
             name_re = re.compile(re.escape(row['name']), re.IGNORECASE)
             desc = name_re.sub("THENAME", row['description'])
             doc = nlp(desc)
@@ -39,10 +52,14 @@ class Model(BaseModel):
 
 
         def get():
+            r = d.loc[0, :]
+            r = get_row(r)
             return np.row_stack([get_row(row) for index, row in d.iterrows()])
 
-        k = "x/n_words={}".format(self.params['n_words'])
-        return self.cache.fetch(k, get)
+        import code; code.interact(local=dict(globals(), **locals()))
+        #
+        #k = "x/n_words={}".format(self.params['n_words'])
+        #return self.cache.fetch(k, get)
 
     def create_model(self):
         hidden = self.params['hidden']
@@ -56,7 +73,7 @@ class Model(BaseModel):
                 Dense(h)
             ])
         layers.extend([
-            Activation('relu'), Dense(len(self.categories)),
+            Activation('relu'), Dense(self.n_out),
             Activation('softmax')
         ])
 
