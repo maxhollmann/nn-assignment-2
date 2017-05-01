@@ -4,7 +4,7 @@ Created on Sat Apr 22 17:04:04 2017
 
 Autoencoder
 
-@author: marc
+@author: Anonymous
 """
 
 from keras.layers import Input, Dense

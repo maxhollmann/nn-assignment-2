@@ -2,7 +2,7 @@
 """
 Created on Wed Apr 19 20:09:33 2017
 
-@author: marc
+@author: Anonymous
 """
 
 # MLP for the IMDB problem

@@ -173,8 +173,7 @@ Our output layer was created using a sigmoid activation function towards our sin
 
 #### Preliminary Results
 
-Parameter checks were done in the same fashion as before.
-
+Parameter checks were done in the same fashion as before. Unfortunately, as with the RNN, also this network did not yield any improvement in predictions and converged at our lower bound. This made us start to believe that we encountered a data-related issue, in the sense that we applied deep learning to a dataset that is just too small. However, the Neural Net we created in section I. yielded above chance performance and gave us something to work with. 
 
 ## IV. Metadata
 
@@ -204,10 +203,12 @@ From the machine learning techniques we applied on the metadata we might be able
 
 ## Result
 
-The final test set accuracy we achieved after adding the Neural Net predictions into the machine learning algorithms was **81.93%**, with the GLM providing the best results.
-
+The final test set accuracy we achieved after adding the Neural Net predictions (from I.) into the machine learning algorithms was **81.93%**, with the GLM providing the best results.
 
 # Discussion
+
+
+In the end we had to stick with a rather small neural net and a good increment of the final prediction accuracy was not due to the Neural Net, but to other machine learning approaches. The challenging aspect about our project was that most NLP networks were dealing with slightly different problems, so that there was no easy generalization we could derive.
 
 It was difficult to know which architecture should be applied in order to create a well-functioning Neural Net. We tried to stick with some rules of thumb when coming up with a successful architecture:
 
@@ -215,7 +216,7 @@ It was difficult to know which architecture should be applied in order to create
 - One should take an additive approach by starting with a minimal amount of hidden layers and then experiment whether adding layers improves the outcome.
 - Hidden layers usually contain an amount of nodes which is smaller than the input layer nodes and larger than the output layer nodes.
 
-The challenging aspect about our project was that most NLP networks were dealing with slightly different problems, so that there was no easy generalization we could derive. Still
+For the LSTM and CNN models, we tried many different architectures, but always ended up with all predictions toward one group, which was disappointing.
 
 # References
 
