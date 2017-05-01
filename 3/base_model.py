@@ -63,6 +63,13 @@ class BaseModel:
     def predict(self, x):
         return self.decode_y(self.model.predict(x))
 
+    def predict_undecoded(self, x):
+        return self.model.predict(x)
+
+    def debug(self, x):
+        p = self.model.predict(x)
+        import code; code.interact(local=dict(globals(), **locals()))
+
 
     def params_str(self):
         def sanitize(s):

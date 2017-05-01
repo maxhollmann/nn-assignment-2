@@ -4,6 +4,7 @@ import re
 from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM
 from keras.layers.embeddings import Embedding
+from keras.layers.convolutional import Conv1D, MaxPooling1D
 from keras.preprocessing import sequence, text
 from collections import Counter
 
@@ -16,18 +17,18 @@ class Model(BaseModel):
     version = 1
 
     params = [
-        {'opt': 'SGD', 'lr': 0.05, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
-        {'opt': 'SGD', 'lr': 0.05, 'epochs': 2, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
-        {'opt': 'SGD', 'lr': 0.05, 'epochs': 3, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+        # {'opt': 'SGD', 'lr': 0.05, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+        # {'opt': 'SGD', 'lr': 0.05, 'epochs': 2, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+        # {'opt': 'SGD', 'lr': 0.05, 'epochs': 3, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
 
-        {'opt': 'SGD', 'lr': 0.2, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
-        {'opt': 'SGD', 'lr': 0.9, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+        # {'opt': 'SGD', 'lr': 0.2, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
+        # {'opt': 'SGD', 'lr': 0.9, 'epochs': 1, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'hidden': [1000]},
 
-        {'opt': 'SGD', 'lr': 0.1, 'epochs': 2, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'dropout': 0.2},
+        # {'opt': 'SGD', 'lr': 0.1, 'epochs': 2, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'dropout': 0.2},
 
-        {'opt': 'SGD', 'lr': 0.1, 'epochs': 2, 'bt': 32, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'dropout': 0.2},
+        # {'opt': 'SGD', 'lr': 0.1, 'epochs': 2, 'bt': 32, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 200, 'dropout': 0.2},
 
-        {'opt': 'SGD', 'lr': 0.1, 'epochs': 2, 'bt': 32, 'embedlen': 32, 'vocabsize': 400, 'textlen': 50, 'dropout': 0.2},
+        {'opt': 'SGD', 'lr': 0.1, 'epochs': 4, 'bt': 32, 'embedlen': 32, 'vocabsize': 4000, 'textlen': 500, 'dropout': 0.2},
     ]
 
 
@@ -69,30 +70,16 @@ class Model(BaseModel):
     def create_model(self):
         embedding = Embedding(self.params['vocabsize'],
                               self.params['embedlen'],
-                              mask_zero = True,
+                              #mask_zero = True,
                               input_length = self.params['textlen'])
+
+
 
         model = Sequential()
         model.add(embedding)
-
-        dropout = self.params.get('dropout', 0)
-        model.add(LSTM(100, dropout=dropout, recurrent_dropout=dropout))
+        model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
+        model.add(MaxPooling1D(pool_size=2))
+        model.add(LSTM(100))
         model.add(Dense(self.n_out, activation='sigmoid'))
-
-
-        # hidden = self.params['hidden']
-
-        # layers = [
-        #     Dense(hidden[0], input_dim=2*self.params['n_words']*300)
-        # ]
-        # for h in hidden[1:]:
-        #     layers.extend([
-        #         Activation('relu'),
-        #         Dense(h)
-        #     ])
-        # layers.extend([
-        #     Activation('relu'), Dense(self.n_out),
-        #     Activation('softmax')
-        # ])
 
         return model

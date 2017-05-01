@@ -2,7 +2,9 @@ import numpy as np
 import spacy
 import re
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
+from keras.layers import Dense, Activation, Dropout, Flatten
+from keras.layers.convolutional import Conv1D
+from keras.layers.pooling import MaxPooling1D
 from keras.constraints import maxnorm
 
 from base_model import BaseModel
@@ -42,7 +44,7 @@ class Model(BaseModel):
     # params.append({"epochs": 250, "opt": "SGD", "bs": 256, "lr": 0.025, "n_words": 5, "hidden": [1000, 1000]})
     # params.append({"epochs": 250, "opt": "SGD", "bs": 256, "lr": 0.025, "n_words": 10, "hidden": [1000, 1000, 1000]})
 
-    params.append({"epochs": 250, "opt": "SGD", "bs": 256, "lr": 0.025, "n_words": 10, "hidden": [1000, 1000, 1000]})
+    params.append({"epochs": 50, "opt": "SGD", "bs": 256, "lr": 0.25, "n_words": 10})
     #params.append({"epochs": 1, "opt": "SGD", "bs": 256, "lr": 0.025, "n_words": 10, "hidden": [1000, 1000, 1000]})
 
 
@@ -65,26 +67,23 @@ class Model(BaseModel):
                 else:
                     out.append(doc[i].vector)
 
-            return np.hstack(out)
+            return out
 
 
         def get():
-            return np.row_stack([get_row(row) for index, row in d.iterrows()])
+            return np.array([get_row(row) for index, row in d.iterrows()])
 
-        k = "wordvecs/x/n_words={}".format(self.params['n_words'])
+        k = "conv/x/n_words={}".format(self.params['n_words'])
         return self.cache.fetch(k, get)
 
     def create_model(self):
         model = Sequential()
 
-        hidden = self.params['hidden']
-
         #model.add(Dropout(self.params.get('dropout', 0)))
-        model.add(Dense(hidden[0], input_dim=2*self.params['n_words']*300))
-
-        for h in hidden[1:]:
-            model.add(Dense(h, activation='relu')) # , kernel_constraint=maxnorm(3)
-
+        model.add(Conv1D(10, 2, input_shape=(20, 300, )))
+        model.add(MaxPooling1D(2))
+        model.add(Flatten())
+        model.add(Dense(100, activation='relu')) # , kernel_constraint=maxnorm(3)
         model.add(Dense(self.n_out, activation='sigmoid'))
 
         return model

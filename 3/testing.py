@@ -48,6 +48,8 @@ class TestCase:
 
             pred_test  = self.model.predict(x_test)
             cnf_matrix.append(metrics.confusion_matrix(y_test, pred_test, labels = self.model.categories))
+            self.store_output(i, test)
+            self.store_model(i)
 
         self.accuracy_test  = np.mean(accuracy_test, axis = 0)
         self.accuracy_train = 0
@@ -58,6 +60,19 @@ class TestCase:
                         ["model", "params", "epoch", "acc"])
         for i, acc in enumerate(self.model.acc_history):
             csv.log([self.model_name, self.model.params_json(), i, acc])
+
+    def store_model(self, i):
+        self.model.model.save(self.path("model_{}.hdf5".format(i)))
+
+    def store_output(self, isplit, test):
+        x = self.model.get_x(self.data)
+        x_test = x[test]
+        out = self.model.predict_undecoded(x_test)
+
+        csv = CsvLogger(self.path("output_{}.csv".format(isplit)),
+                        ["mention_id", "nn_out"])
+        for i, o in enumerate(out):
+            csv.log([self.data.iloc[test[i], :]['mention_id'], o[0]])
 
 
     def store_plots(self):
@@ -95,7 +110,7 @@ class Test:
         for i, case in enumerate(self.cases):
             print("    {}/{}   params: {}".format(i + 1, len(self.cases), str(case.model.params)))
             try:
-                if len(glob(case.path("*"))) == 0:
+                if True or len(glob(case.path("*"))) == 0:
                     case.run()
                     case.log_acc()
                     case.store_plots()
