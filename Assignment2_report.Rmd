@@ -5,37 +5,37 @@ date: "2 May 2017"
 header-includes:
   - \usepackage{amsmath}
   - \usepackage{mathtools}
-output: 
+output:
   pdf_document:
     fig_caption: yes
 ---
 
-In this assignment we aim to understand, apply, and master *Deep Neural Networks (DNN)* and *Deep Learning* in *Keras* (with the *Tensorflow* backend). In the first section we will describe 3 types of (potential) *DNN*s: Convolutional, Autoencoders, and Recurrent; plus providing a proof of understanding through experimenting with existing code and results. The second section will then introduce our Deep Learning Challenge project, followed by a detailed description about our approach, experimentation, results, and a concluding discussion.
+In this assignment we aim to understand, apply, and master *Deep Neural Networks (DNN)* and *Deep Learning* in *Keras* (with the *Tensorflow* backend). In the first section we will describe three types of (potential) *DNN*s: Convolutional, Autoencoders, and Recurrent; plus providing a proof of understanding through experimenting with existing code and results. The second section will then introduce our Deep Learning Challenge project, followed by a detailed description about our approach, experimentation, results, and a concluding discussion.
 
 # 1. Deep Neural Networks
 
 ### Convolutional
 
-A *Convolutional Neural Network (CNN)*, the first (potentially) Deep Neural Network we consider, uses insights from the organisation of the visual cortex in the brain and tries to summarize information by using receptive fields. Put simply, receptive fields consist of a small set of conditions and provide stronger output / are responsive whenever a stimulus matches these conditions. They are locally applied on the input like a moving window and produce a new layer called feature map. One example would be an edge detector in image recognition, which is resembled by a receptive field which responds more strongly whenever one side of the receptive field receives dark (e.g., represented as "-1") and the other side receives light ("+1") information. However, it is not just limited to that and has been succesfully applied to other fields suchs as text procesing.
+A *Convolutional Neural Network (CNN)*, the first (potentially) Deep Neural Network we consider, uses insights from the organisation of the visual cortex in the brain and tries to summarize information by using receptive fields. Put simply, receptive fields consist of a small set of conditions and provide stronger output / are responsive whenever a stimulus matches these conditions. They are locally applied on the input like a moving window and produce a new layer called feature map. One example would be an edge detector in image recognition, which is resembled by a receptive field which responds more strongly whenever one side of the receptive field receives dark (e.g., represented as "-1") and the other side receives light ("+1") information. However, it is not just limited to that and has been succesfully applied to other fields suchs as text processing.
 
 #### Example: CIFAR-10
 
-This dataset stems from a typical computer vision problem: to identify what is on the picture. It consists of 60,000 photos of 32 x 32 pixels. There are 10 different classes such as cars, birds, or airplanes, which the Neural Network is supposed to be able to categorize after learning from the pictures. 50,000 of the images are used for the training set in the present example, while 10,000 images are used to evaluate the overall performance. A CNN is used to catch the underlying features that make up the uniqueness of the image categories. 
+This dataset stems from a typical computer vision problem: to identify what is on the picture. It consists of 60,000 photos of 32 x 32 pixels. There are 10 different classes such as cars, birds, or airplanes, which the Neural Network is supposed to be able to categorize after learning from the pictures. 50,000 of the images are used for the training set in the present example, while 10,000 images are used to evaluate the overall performance. A CNN is used to catch the underlying features that make up the uniqueness of the image categories.
 
 The researchers came up with the following structure to learn about the data:
 
-1. Convolutional input layer: 32 feature maps with a size of 3×3, a rectifier activation function and a weight constraint of max norm set to 3
+1. Convolutional input layer: 32 feature maps with a size of 3Ã—3, a rectifier activation function and a weight constraint of max norm set to 3.
 2. Dropout: 20%.
-3. Convolutional layer: 32 feature maps with a size of 3×3, a rectifier activation function and a weight constraint of max norm set to 3.
-4. Max Pool layer: size 2×2.
-5. Flatten layer
+3. Convolutional layer: 32 feature maps with a size of 3Ã—3, a rectifier activation function and a weight constraint of max norm set to 3.
+4. Max Pool layer: size 2Ã—2.
+5. Flatten layer.
 6. Dense layer: 512 units and a rectifier activation function.
 7. Dropout: 50%.
 8. Dense output layer: 10 units and a softmax activation function.
 
-A batch size of 32 was used and it was run for 25 epochs. The learning rate was 0.01, using the stochastic gradient descent optimization algorithm with a logarithmic loss. The model contains 4,210,090 trainable parameters and the accuracy achieved was 70.85% (note that they improved it to 80.18% in a very extensive version later). 
+A batch size of 32 was used and it was run for 25 epochs. The learning rate was 0.01, using the stochastic gradient descent optimization algorithm with a logarithmic loss. The model contains 4,210,090 trainable parameters and the accuracy achieved was 70.85% (note that they improved it to 80.18% in a very extensive version later).
 
-For the sake of the assignment we were interested in scaling down the problem to fewer images and see whether we can achieve something close to the accuracy above. Thus, we reduced the training set to 25,000 images by random permutation so that we ended up with 2,500 randomly chosen images per category. This should give us insight into the importance of large sample sizes for such problems (which is an issue we will face later in our DL challenge).
+For the sake of the assignment we were interested in scaling down the problem to fewer images and see whether we can achieve something close to the accuracy above. Thus, we reduced the training set to 25,000 images by random sampling so that we ended up with 2,500 randomly chosen images per category. This should give us insight into the importance of large sample sizes for such problems (which is an issue we will face later in our DL challenge).
 
 #### Result
 
@@ -43,13 +43,13 @@ Probing different learning rates and batch sizes (finally, we sticked with the o
 
 ### Autoencoders
 
-The above was an example of supervised learning. Autoencoders instead try to learn "themselves" about the structure of the input given. When given an input vector $x$, the goal is to return an output vector $\hat{x}$ that resembles $x$ as closely as possible. The identity function that was created in such a way is what the experimenter is interested in, as it might reveal new ways of summarizing the data at hand (i.e., dimensionality reduction) or reveal hidden structures in the data (i.e., data denoising). This is done by compression through forcing the network to represent a smaller and as-similar-as-possible version of the original by fewer hidden nodes than what would be needed to just push through all the information. For instance, pictures of the size 10 x 10 pixels might be compressed to 7 x 7 pixel versions. If the restructured 10 x 10 version $\hat{x}$ is close enough to $\hat{x}$ the autoencoder successfully compressed the data. A related method is *Principal Component Analysis (PCA)*, which goal is to project higher-dimensional objects into a lower-dimensional space, so that most of its information is preserved.
+The above was an example of supervised learning. Autoencoders instead try to learn "themselves" about the structure of the input given. When given an input vector $x$, the goal is to return an output vector $\hat{x}$ that resembles $x$ as closely as possible. The identity function that was created in such a way is what the experimenter is interested in, as it might reveal new ways of summarizing the data at hand (i.e., dimensionality reduction) or reveal hidden structures in the data (i.e., data denoising). This is done by compression through forcing the network to represent a smaller and as-similar-as-possible version of the original by fewer hidden nodes than what would be needed to just push through all the information. For instance, pictures of the size 10 x 10 pixels might be compressed to 7 x 7 pixel versions. If the restructured 10 x 10 version $\hat{x}$ is close enough to $\hat{x}$ the autoencoder successfully compressed the data. A related method is *Principal Component Analysis (PCA)*, of which the goal is to project higher-dimensional objects into a lower-dimensional space, in a way that most of its information is preserved.
 
 #### Example: CIFAR-10 Autoencoder
 
 Before we handled the CIFAR-10 problem with a convolutional net and achieved rather mediocre accuracy with our reduced dataset. We could also be interested in compressing the data using autoencoders to get a better idea about the underlying properties of the categories. This could aid future approaches to improve on the accuracy concerning the problem by giving a sense for the complexity of the data.
 
-For that we used existing code for the MNIST handwritten digts dataset and applied it to the CIFAR-10 problem, experimenting with batch size, learning rate, and epochs. Our goal was to find a suitable dimensionality so that we will be able to identify the images after compression and on the same time achieve some downscaling.
+For that we used existing code for the MNIST handwritten digits dataset and applied it to the CIFAR-10 problem, experimenting with batch size, learning rate, and epochs. Our goal was to find a suitable dimensionality so that we will be able to identify the images after compression and at the same time achieve some downscaling.
 
 #### Result
 
@@ -65,25 +65,25 @@ The model was being compiled using the AdaDelta optimizer and per-pixel binary c
 
 ![Output Images, each line with different dimensionality: (1) 32 floats (val.loss = 0.60), (2) 64 floats (val.loss = 0.60), (3) 128 floats (val.loss = 0.59), (4) 512 floats (val.loss = 0.58).](2/autoencoder_alloutput.png)
 
-The validation loss seems pretty high when comparing it to the MNIST results and it is obvious from the pictures that we did not really manage to reproduce the original pictures after downscaling them to the smaller feature vectors. The images must be too complex for the amount of data we have, thus it is difficult to find underlying patterns that can summarize the images. This definitely makes sense in comparison to the MNIST dataset, in which large patches of the pictures can be summarized more efficiently than here (i.e., monotonous black areas). 
+The validation loss seems pretty high when comparing it to the MNIST results and it is obvious from the pictures that we did not really manage to reproduce the original pictures after downscaling them to the smaller feature vectors. The images must be too complex for the amount of data we have, thus it is difficult to find underlying patterns that can summarize the images. This definitely makes sense in comparison to the MNIST dataset, in which large patches of the pictures can be summarized more efficiently than here (i.e., monotonous black areas).
 
 ### Recurrent
 
-*Recurrent Neural Networks (RNNs)*, in contrast to *Feedforward Neural Networks*, extend the network by including cyclic aspects between the units. Thus, instead of units depending statically on the other layers, elements inside the network may be allowed to change dynamically, so that activations over time can alter the expression of a layer.  
+*Recurrent Neural Networks (RNNs)*, in contrast to *Feedforward Neural Networks*, extend the network by including cyclic aspects between the units. Thus, instead of units depending statically on the other layers, elements inside the network may be allowed to change dynamically, so that activations over time can alter the expression of a layer.
 
-This enables us to make use of sequential information, i.e. we do not have to assume that all inputs (and outputs) are independent of each other. We can use previous computations to alter the network on how to process new incoming information; in other words the network remembers what has happened just before. Good examples for the application of RNNs lie in text processing or *Natural Language Processing (NLP)*. A sometimes used architecture is *Long Short-Term Memory (LSTM)*, which constructs "smart neurons" that, depending on the input, keep the old information intact or overwrite it with the new information.
+This enables us to make use of sequential information, i.e. we do not have to assume that all inputs (and outputs) are independent of each other. We can use previous computations to alter the network on how to process new incoming information; in other words the network remembers what has happened just before. Good examples for the application of RNNs lie in text processing or *Natural Language Processing (NLP)*. An often used architecture is *Long Short-Term Memory (LSTM)*, which constructs "smart neurons" that, depending on the input, keep the old information intact or overwrite it with the new information.
 
 #### Example using LSTM: the IMDB movie review sentiment classification problem
 
-This NLP problem comes with a dataset containing movie reviews of users from IMDb.com. The goal is to find out whether they are positive or negative reviews; in other words, we need to construct a Neural Net which uses the aspects of a review that hint towards one or the other and learn heuristics that enable it to make an accurate classification. A trick that is being used here is Embedding, which maps each word onto an length $n$ vector (here $n = 32$) that is supposed to resemble the unique position of a word in a $n$-dimensional space. (Note that the original dataset transformed the words into sorted integers from most to least common word, however the same mechanism applies). To simplify the problem, the authors decided to limit the data by using only the most frequent 5000 words and truncating or lengthening (concatenating 0s) the reviews so that their length was always 500 words.
+This NLP problem comes with a dataset containing movie reviews of users from IMDb.com. The goal is to find out whether they are positive or negative reviews; in other words, we need to construct a Neural Net which uses the aspects of a review that hint towards one or the other and learn heuristics that enable it to make an accurate classification. A trick that is being used here is Embedding, which maps each word onto a length $n$ vector (here $n = 32$) that is supposed to resemble the unique position of a word in an $n$-dimensional space. (Note that the original dataset transformed the words into sorted integers from most to least common word, however the same mechanism applies). To simplify the problem, the authors decided to limit the data by using only the most frequent 5000 words and truncating or lengthening (concatenating 0s) the reviews so that their length was always 500 words.
 
 The researchers decided on the following structure:
 
-1. Embedded layer: uses length 32 vector to represent each word. 
+1. Embedded layer: uses length 32 vector to represent each word.
 2. Dropout: 20%.
-3. LSTM layer: 100 "smart neurons"
+3. LSTM layer: 100 "smart neurons".
 4. Dropout: 20%.
-5. Dense output layer: single neuron with sigmoid activation function for good/bad classification
+5. Dense output layer: single neuron with sigmoid activation function for good/bad classification.
 
 The dropout layers were investigated in order to see whether we have to deal with overfitting issues in the model. Dropout prevents units in the Neural Net to adapt too much to another unit by randomly dropping them during training. A batch size of 64 reviews were used and only 3 epochs were run because of overfitting concerns. When running the model, it achieved a 86.79% validation set accuracy without, and 86.36% when no dropout was applied.
 
@@ -97,34 +97,34 @@ d <- data.frame(Neurons = c(10, 20, 50, 100), Val.Accuracy = c("78.64%", "85.82%
 kable(d, caption = "Recurrent Network: Smart Neurons Necessary to Achieve Good Predictions")
 ```
 
-The table indicates that best accuracy is actually being achieved with 50 smart neurons instead of 100. Our first intuition is that it might be a result of overfitting in the 100 neuron case. Other reasons we came up with are that (1) more epochs might be necessary to fit appropriately on the larger set, or (2) the batch size should be increased to reduce variance in the weight updates to counteract increased noise.  
+The table indicates that best accuracy is actually being achieved with 50 smart neurons instead of 100. Our first intuition is that it might be a result of overfitting in the 100 neuron case. Other reasons we came up with are that (1) more epochs might be necessary to fit appropriately on the larger set, or (2) the batch size should be increased to reduce variance in the weight updates to counteract increased noise.
 
 # 2. Deep Learning Challenge: Podcast Guests & NLP
 
 Who's joining the podcast episode? Usually, when trying to find a podcast with your favorite star speaking as a guest, you end up scrolling through many irrelevant alternatives. They range from people just talking about him or her, talking about a song or movie related to him or her, or the star's name might even just be used in a keyword-like fashion to generate more clicks.
 
-To overcome this, for our Deep Learning Challenge we were interested in whether we can apply Deep Learning to podcast descriptions. We want to find out whether a person's name occurred in the podcast description because the person is an actual guest at the show or whether it was due to any other reason.
+To overcome this, for our Deep Learning Challenge we were interested in whether we can apply Deep Learning to podcast descriptions. We want to find out whether a person's name occurred in the podcast description because the person is an actual guest on the show or whether it was due to any other reason.
 
 ## Data & Preprocessing
 
-Podcast episode descriptions are very heterogeneous: They can take up various lengths from title only up to a full blog post, discuss different topics, and may include a lot of (to us) irrelevant names. To get a better idea about how a typical description might look like, see the following example:
+Podcast episode descriptions are very heterogeneous: They can take various shapes, from only a headline to a full blog post, discuss different topics, and may include a lot of (for our purpose) irrelevant names. To get a better idea about how a typical description might look like, see the following example:
 
-![Example of a podcast description: Bill Simmons Podcast Ep. 92 with guest Louis C.K.; our goal is to find out that Louis C.K. is a guest.](podcast_example_labelled.png)
+![Example of a podcast description: Bill Simmons Podcast Ep. 92 with guest Louis C.K.; our goal is to find out that Louis C.K. is the only guest.](podcast_example_labelled.png)
 
-In order to approach the problem, we first had to scrape podcasts from the web (we used iTunes) and identify occurrences of names. This was achieved through the Stanford Named Entity Recognizer (NER), which proved to have a very good detection rate. From there we manually labelled 1219 occurrences of names into "guest" (36.2%) or "no guest" (63.8%) from the descriptions (incl. title) of a total of 550 podcast episodes.
+In order to approach the problem, we first had to scrape podcasts from the web (we iTunes' database) and identify occurrences of names. This was achieved through the Stanford Named Entity Recognizer (NER), which proved to have a very good detection rate. From there we manually labelled 1219 occurrences of names into "guest" (36.2%) or "no guest" (63.8%) from the descriptions (incl. title) of a total of 550 podcast episodes.
 
 ## I. NLP: Word Vectors
 
-First of all, we tried to come up with a model that somewhat mimicks the cognitive process we are undergoing when identifying a guest from a non-guest. We noticed that, instead of scanning the whole document, we would usually quickly scan for a name, consider only the couple of words surrounding a name, and derive from its syntax what role the person will play in the podcast episode. This led us to chunk our data into portions with $n$ words to the left and the right, thus of the structure:
+First of all, we tried to come up with a model that somewhat mimicks the cognitive process we are undergoing when identifying a guest from a non-guest. We noticed that, instead of scanning the whole document, we would usually quickly scan for a name, consider only the couple of words surrounding that name, and derive from that what role the person likely plays in the podcast episode. This led us to consider only a window of $n$ words to the left and the right of the name, thus of the structure:
 
 \begin{equation}
   \{ S_{t-n}, ..., S_{t-2}, S_{t-1}, S_{t} = S_{name}, S_{t+1}, S_{t+2}, ..., S_{t+n} \}
 \end{equation}
 
-We also considered other ideas, such as taking full sentences in which a name appeared.
+We also considered other ideas, such as taking full sentences in which the name appeared.
 The advantage of this approach, however, was that the input for our network was always of the same size, which significantly reduced issues coming up in creating the architecture for our Neural Net.
 
-Having the data organized, it was still not suited for analysis as we were dealing with strings. For that reason we made use of embedding techniques which map words to a predefined vector of dimensionality, or size, $p$. This way all words are put into a space in which they can be meaningfully related to each other. For instance, a distance measure will give a smaller value for the word vectors "king" and "queen", as compared to word vectors "king" and "apple". A suitable package in Python was *spacyIO*, which comes with a pre-trained vector with $p = 300$ from the Common Crawl corpus, which represents the cutting edge standard embedding vector for practical NLP. It was constructed using the *GloVe* algorithm (see References for documentation and examples). Strings $S$ were subsequently transformed into word vectors $x \in \mathbb{R}^{300}$. Since we only needed the location of the name $S_{name}$ and not its actual meaning, we could drop it, being left with our input data of size $2 \times n \times 300$:
+Having the data organized, it was still not suited for analysis as we were dealing with strings. For that reason we made use of embedding techniques which map words to a predefined vector of dimensionality, or size, $p$. This way all words are put into a space in which they can be meaningfully related to each other. For instance, a distance measure will give a smaller value for the word vectors "king" and "queen", as compared to word vectors "king" and "apple". A suitable package in Python was *spacyIO*, which comes with pre-trained word-vectors with $p = 300$ from the Common Crawl corpus, which represents the cutting edge standard embedding vector for practical NLP. It was constructed using the *GloVe* algorithm (see References for documentation and examples). Strings $S$ were subsequently transformed into word vectors $x \in \mathbb{R}^{300}$. Since we only needed the location of the name $S_{name}$ within its context and not its actual meaning, we could drop it, being left with our input data of size $2 \times n \times 300$:
 
 \begin{equation}
   Input = \{x_{t-n}, ..., x_{t-2}, x_{t-1}, x_{t+1}, x_{t+2}, ..., x_{t+n} \}
@@ -134,7 +134,7 @@ In case a name appeared at the very beginning (as it might happen in the title) 
 
 #### Preliminary Results
 
-To get a feeling about the classification ability of a simple network, we constructed a 1-or-2-layer Neural Network, setting up its architecture in a way that it classifies into guest or non-guest. 
+To get a feeling about the classification ability of a simple network, we constructed a 1-or-2-layer Neural Network, setting up its architecture in a way that it classifies into guest or non-guest.
 
 To find out the best parameters for the model, we first experimented a bit with them to get a feeling about the range that makes sense and then tried out each possible combinations of the following options:
 
@@ -144,7 +144,7 @@ To find out the best parameters for the model, we first experimented a bit with 
 - hidden layers: 1, 2
 - nodes of hidden layers: 10, 100, 1000
 
-Additionally, we experimented with batch size, where we agreed to use segments of 256 inputs, and optimizers, with *Stochastic Gradient Descent (SGD)* performing the best. The final network we ended up with achieved a k-fold cross-validated accuracy of 75.31% and had the following architecture:
+Additionally, we experimented with batch size, where we agreed to use segments of 256 inputs, and optimizers, with *Stochastic Gradient Descent (SGD)* performing the best. The final network we ended up with achieved a 5-fold cross-validated accuracy of 75.31% and had the following architecture:
 
 1. Input layer: $2 \times 5 \times 300 = 3000$ nodes
 2. Dense hidden layer: 100 nodes with ReLu activation function
@@ -188,7 +188,7 @@ In order to achieve high performance, we gave the problem some more thought and 
 - amount of times name (also: first/last name only) is mentioned in description (int)
 - amount of times name is mentioned in dataset source (int; also unlabeled cases)
 
-Some of the metadata should help us disentangle the different roles people have in podcast descriptions (e.g. being "officially" listed as podcast author makes you pretty unlikely to be a guest at a show). 
+Some of the metadata should help us disentangle the different roles people have in podcast descriptions (e.g. being "officially" listed as podcast author makes you pretty unlikely to be a guest at a show).
 
 #### Preliminary Results
 
