@@ -2,7 +2,7 @@
 """
 Created on Thu Apr  6 18:56:10 2017
 
-@author: marc
+@author: Anonymous
 
 This example demonstrates the use of Convolution1D for text classification.
 

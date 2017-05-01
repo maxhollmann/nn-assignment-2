@@ -4,7 +4,7 @@ Created on Fri Apr 21 14:50:28 2017
 
 Plotting.
 
-@author: marc
+@author: Anonymous
 """
 
 import numpy

@@ -1,6 +1,6 @@
 ---
 title: "Caret Package Analysis"
-author: "Marc Volkert"
+author: "Anonymous & Anonymous"
 date: "31 Januar 2017"
 output: 
   html_document:

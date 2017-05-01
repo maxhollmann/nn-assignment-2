@@ -4,7 +4,7 @@ Created on Tue Apr 11 10:50:11 2017
 
 Convolutional Neural Network original plot.
 
-@author: marc
+@author: Anonymous
 """
 
 # Plot ad hoc CIFAR10 instances

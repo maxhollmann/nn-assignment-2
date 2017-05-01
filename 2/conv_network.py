@@ -4,7 +4,7 @@ Created on Tue Apr 11 10:36:07 2017
 
 Convolutional Network Example
 
-@author: marc
+@author: Anonymous
 """
 
 # Simple CNN model for CIFAR-10

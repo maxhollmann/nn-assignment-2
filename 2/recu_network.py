@@ -2,7 +2,7 @@
 """
 Created on Fri Apr 21 15:51:38 2017
 
-@author: marc
+@author: Anonymous
 """
 
 # LSTM for sequence classification in the IMDB dataset

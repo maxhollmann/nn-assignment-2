@@ -215,7 +215,7 @@ It was difficult to know which architecture should be applied in order to create
 - One should take an additive approach by starting with a minimal amount of hidden layers and then experiment whether adding layers improves the outcome.
 - Hidden layers usually contain an amount of nodes which is smaller than the input layer nodes and larger than the output layer nodes.
 
-The challenging aspect about our project was that most NLP networks were dealing with slightly different problems, so that there was no easy generalization we could derive. Still
+The challenging aspect about our project was that most NLP networks were dealing with slightly different problems, so that there was no easy generalization we could derive.
 
 # References
 

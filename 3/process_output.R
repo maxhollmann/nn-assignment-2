@@ -1,6 +1,6 @@
 library(ggplot2)
 
-setwd("/home/max/dev/nn/assignment2/3")
+
 out_dir = "duranium/out"
 
 model_f = paste(out_dir, "models.csv", sep = "/")
